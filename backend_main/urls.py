@@ -1,19 +1,17 @@
 from django.urls import path, re_path, include
-from . import views
+from .views import home_view
 
 
 
 urlpatterns = [
-    #Auth API
-    path('auth/test_endpoint', views, name="Test view"),
-    
-    
     #Process browser
     # 1. Display page -> return htmx
+    path('test/', home_view, name="Process browser view"),#processbrowser
     # 2. Get list of processes -> return json
     # 3. Take snapshot -> return json
     # 4. Kill process -> return json
-        
+    
+    
     
     #Snapshot browser
     # 1. Display page -> return htmx
