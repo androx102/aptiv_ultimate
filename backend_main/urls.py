@@ -10,7 +10,7 @@ urlpatterns = [
     path('proc_browser', Process_browser_view.as_view(), name="Process browser view"),
     
     # 2. Get list of processes -> return json
-    path('proc_browser/processes/', Process_API, name="Return list of processes"),
+    path('API/processes/', Process_API, name="Return list of processes"),
     
     
 

@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.views import View
 import pathlib
 
-templates_dir = pathlib.Path(__file__).resolve().parent / "templates"
+templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
 
 
 
