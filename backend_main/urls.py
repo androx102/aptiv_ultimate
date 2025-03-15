@@ -1,15 +1,25 @@
 from django.urls import path, re_path, include
-from .views import home_view
+from .views import *
 
 
 
 urlpatterns = [
+    
     #Process browser
     # 1. Display page -> return htmx
-    path('test/', home_view, name="Process browser view"),#processbrowser
+    path('proc_browser', Process_browser_view.as_view(), name="Process browser view"),
+    
     # 2. Get list of processes -> return json
+    path('proc_browser/processes/', Process_API, name="Return list of processes"),
+    
+    
+
     # 3. Take snapshot -> return json
+    #path('API/processes/<str:id>', Process_API, name="Takes snapshot"),
+    
     # 4. Kill process -> return json
+    #path('API/processes/<str:id>', Process_API, name="Takes snapshot"),
+    
     
     
     
