@@ -24,20 +24,25 @@
                 
 
                 <label class="fieldset-label">Email</label>
-                <input type="email" class="input" placeholder="Email" />
+                <input type="email" id="Email_id" name="email" class="input" placeholder="Email" />
                 
                 <label class="fieldset-label">Username</label>
-                <input type="username" class="input" placeholder="Username" />
+                <input type="username" id="Username_id" name="username" class="input" placeholder="Username" />
                 
                 <label class="fieldset-label">Password</label>
-                <input type="password" class="input" placeholder="Password" />
+                <input type="password" id="Password_id" name="password" class="input" placeholder="Password" />
 
                 <label class="fieldset-label">Repeat password</label>
-                <input type="password" class="input" placeholder="Password" />
+                <input type="password" id="Rpassword_id" name="rpassword" class="input" placeholder="Password" />
                 
-                <button class="btn btn-neutral mt-4">Sign up</button>
+                <button class="btn btn-neutral mt-4" hx-post="/API/sign-up/" hx-include="#Username_id, #Password_id, #Rpassword_id, #Email_id"
+                hx-target="#result-container">
+                     Sign up
+                </button>
+                <div id="result-container"></div>
                 <p>Already have account? <a href="/sign-in" class="font-semibold">Sign In</a></p>
               </fieldset>
         </div>
 </body>
 </html>
+

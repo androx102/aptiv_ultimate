@@ -20,12 +20,17 @@
   
 
     <!-- Main Content -->
-    <div class="flex-1 p-6">
-        <!-- Sidebar -->
+    <div class="flex">
+        
+		<!-- Sidebar -->
+		{% include "partials/sidebar.html" %}
 
         <!-- Main content-->
+		<div class="p-7 flex-grow"> 
         {% block content %}
         {% endblock content %}
+		</div>
+    
     </div>
 		  
 	</body>

@@ -1,4 +1,25 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+
+
+    
+
+
+
+class User_object(AbstractUser):   
+    class Role(models.IntegerChoices):
+        ADMIN = 3, 'Admin'
+        MODERATOR = 2, 'Read and kill'
+        USER = 1, 'Read only'
+        
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = []
+    
+    
+    username = models.CharField(max_length=254,unique=True)
+    email= models.EmailField(blank=True, max_length=254, verbose_name='email address',unique=True)
+    user_role = models.IntegerField(choices=Role.choices, default=1)
 
 
 
