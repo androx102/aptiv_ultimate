@@ -1,15 +1,43 @@
+{% load static tailwind_tags %}
+
 <!DOCTYPE html>
 <html>
 
-{% load static %}
 
-<script src="{% static 'htmx.min.js' %}"></script>
+<head>
+        <title>Sign Up</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+            <!-- Loading Tailwind and HTMX -->
+            {% tailwind_css %}
+            {% load static %}
+            <script src="{% static 'htmx.min.js' %}"></script>
+</head>
 
 
 <body>
-        <h1>Some testing</h1>
-        <button hx-get="API/processes/">
-                test button
-            </button>
+        <div class="w-full min-h-screen flex items-center justify-center"> 
+            <fieldset class="fieldset w-xs bg-base-200 border border-base-300 p-4 rounded-box">
+                <legend class="fieldset-legend">Sign Up</legend>
+                
+
+                <label class="fieldset-label">Email</label>
+                <input type="email" class="input" placeholder="Email" />
+                
+                <label class="fieldset-label">Username</label>
+                <input type="username" class="input" placeholder="Username" />
+                
+                <label class="fieldset-label">Password</label>
+                <input type="password" class="input" placeholder="Password" />
+
+                <label class="fieldset-label">Repeat password</label>
+                <input type="password" class="input" placeholder="Password" />
+                
+                <button class="btn btn-neutral mt-4">Sign up</button>
+                <p>Already have account? <a href="/sign-in" class="font-semibold">Sign In</a></p>
+              </fieldset>
+        </div>
 </body>
 </html>

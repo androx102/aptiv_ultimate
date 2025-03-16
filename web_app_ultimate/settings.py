@@ -63,7 +63,7 @@ ROOT_URLCONF = 'web_app_ultimate.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'backend_main/templates/backend_main'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

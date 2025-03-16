@@ -38,6 +38,24 @@ def Process_API(request):
         return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
+
+
+class Snapshot_browser_view(View):
+    def get(self, request):
+        return render(request, f'{templates_dir}/snapshot_browser.html')
    
 
+
+class Kill_Log_browser_view(View):
+    def get(self, request):
+        return render(request, f'{templates_dir}/killlog_browser.html')
+    
+    
+class Login_view(View):
+    def get(self, request):
+        return render(request, f'{templates_dir}/signIN.html')
+    
+class Register_view(View):
+    def get(self, request):
+        return render(request, f'{templates_dir}/signUP.html')
 

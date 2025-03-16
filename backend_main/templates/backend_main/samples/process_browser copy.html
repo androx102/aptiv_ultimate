@@ -1,0 +1,47 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    <title>Django Tailwind</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		{% tailwind_css %}
+
+		{% load static %}
+
+		<script src="{% static 'htmx.min.js' %}"></script>
+	</head>
+
+
+
+
+
+	<body class="bg-gray-50 font-serif leading-normal tracking-normal">
+    
+        {% include 'partials/sidebar.html' %}
+        <!-- Sidebar -->
+    <div class="drawer lg:drawer-open">
+        <input id="sidebar-toggle" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col items-center justify-center p-4">
+            <!-- Page content here -->
+            <label for="sidebar-toggle" class="btn btn-primary drawer-button lg:hidden">Open Menu</label>
+            <h1 class="text-4xl font-bold">Welcome to DaisyUI Sidebar!</h1>
+        </div> 
+        
+        <div class="drawer-side">
+            <label for="sidebar-toggle" class="drawer-overlay"></label> 
+            <ul class="menu p-4 w-64 min-h-full bg-base-200 text-base-content">
+                <li><a href="#" class="text-lg font-semibold">Dashboard</a></li>
+                <li><a href="#" class="text-lg font-semibold">Processes browser</a></li>
+                <li><a href="#" class="text-lg font-semibold">Snapshot browser</a></li>
+                <li><a href="#" class="text-lg font-semibold">Kill log browser</a></li>
+                <li><a href="#" class="text-lg font-semibold">User settings</a></li>
+                <li><a href="#" class="text-lg font-semibold"> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+		  
+	</body>
+</html>

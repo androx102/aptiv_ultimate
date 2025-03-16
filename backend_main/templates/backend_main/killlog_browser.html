@@ -1,15 +1,17 @@
-<!DOCTYPE html>
-<html>
-
-{% load static %}
-
-<script src="{% static 'htmx.min.js' %}"></script>
+{% extends "base.html" %}
 
 
-<body>
-        <h1>Some testing</h1>
-        <button hx-get="API/processes/">
-                test button
-            </button>
-</body>
-</html>
+{% block title %}Kill Log browser{% endblock %}  
+
+
+{% block content %}
+    <!-- Main Content -->
+    <h1 class="text-4xl font-bold">Processes Browser</h1>
+    <p class="text-lg">Welcome to the Django app with partial templates.</p>
+    <button hx-get="API/processes/">
+        test button
+    </button>
+{% endblock content %}
+
+	
+

@@ -1,0 +1,32 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    	<title>{% block title %} Django Tailwind {% endblock %}</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+		<!-- Loading Tailwind and HTMX -->
+		{% tailwind_css %}
+		{% load static %}
+		<script src="{% static 'htmx.min.js' %}"></script>
+	</head>
+
+
+
+	<body class="font-serif leading-normal tracking-normal">
+  
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6">
+        <!-- Sidebar -->
+
+        <!-- Main content-->
+        {% block content %}
+        {% endblock content %}
+    </div>
+		  
+	</body>
+</html>
