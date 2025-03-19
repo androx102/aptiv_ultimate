@@ -6,56 +6,60 @@ from .views import *
 
 urlpatterns = [
     
+    #Index
+    path("", index, name='index'),
+    
+    
     #Process browser
     # 1. Display page -> return htmx
-    path('proc-browser/', Process_browser_view.as_view(), name="Process browser view"),
+    path('processes/', Process_browser_view.as_view(), name="processes"),
     
-    # 2. Get list of processes -> return json
-    path('API/processes/', Process_API, name="Return list of processes"),
-    
-    # 3. Take snapshot -> return json
-    #path('API/processes/<str:id>', Process_API, name="Takes snapshot"),
-    
-    # 4. Kill process -> return json
-    #path('API/processes/<str:id>', Process_API, name="Takes snapshot"),
+    # 2. Take snapshot -> return json
+    path('API/processes/snap/', Process_API_snap, name="take_snapshot"),
+       
+    # 3. Kill process -> return json
+    #path('API/processes/<str:id>', Process_API, name="kill_proc"),
     
     
     
     
     #Snapshot browser
     # 1. Display page -> return htmx
-    path('snap-browser/', Snapshot_browser_view.as_view(), name="Snapshot browser view"),
+    path('snapshots/', Snapshot_browser_view.as_view(), name="snapshots"),
     
-    # 2. Get list of snapshots -> return json
+    # 2. Remove snapshot
+    #path('API/snap/del/<str:id>', Process_API_snap, name="del_snap"),
     
     
-    # 3. Export to excel -> return file (file storage for bigger files?)
+    # 3. Export to excel -> return file 
+    #path('API/snap/excel/<str:id>', Process_API_snap, name="export_snap"),
     
     
     #Kill log interface
     # 1. Display page -> return htmx
-    path('kill-browser/', Kill_Log_browser_view.as_view(), name="Kill log browser view"),
+    path('kill-log/', Kill_Log_browser_view.as_view(), name="kill-log"),
     
-    # 2. Get list of killed processes -> return json
+
     
     
     
     #Auth
     # 1. Sign-in page -> return htmx
-    path('sign-in/', Login_view, name="Sign-IN view"),
+    path('sign-in/', Login_view, name="sign-in"),
     
     # 2. Sign-in endpoint -> retunr json
     path('API/sign-in/', Login_API, name="JWT obtain endpoint"),
     
     # 3. Refresh token endpoint -> return json //Even needed ?!?
+ 
     
+    # 4. Sign-up page -> -> return htmx
+    path('sign-up/', Register_view, name="sign-up"),
     
-    # 4. Logout endpoint -> retunr json
-    
-    
-    # 5. Sign-up page -> -> return htmx
-    path('sign-up/', Register_view, name="Sign-UP view"),
-    
-    # . Sign-up endpoint -> retunr json
+    # 5. Sign-up endpoint -> retunr json
     path('API/sign-up/', Register_API, name="Sign-UP endpoint"),
+    
+    # 6. Logout 
+    path('API/log-out/', Log_out_API, name="logout"),
+    
 ]

@@ -1,0 +1,14 @@
+{% for process in processes %}
+<!--class="hover:bg-base-100"-->
+<tr >
+    <td>{{ process.process_id }}</td>
+    <td>{{ process.process_status }}</td>
+    <td>{{ process.process_start_time }}</td>
+    <td>{{ process.process_duration }}</td>
+    <td>{{ process.process_name }}</td>
+    <td>{{ process.process_memory_usage }}</td>
+    <td>{{ process.process_cpu_usage }}</td>
+    <td>Kill motherfucker</td>
+</tr>
+{% endfor %}
+            

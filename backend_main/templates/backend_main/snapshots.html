@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block head_title %} Snapshots {% endblock %}
+
+{% block content %}
+{% include 'partials/navbar.html' %}
+<style>
+
+    table { width: 100%; border-collapse: collapse; background: white; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    td { color: black }
+    
+    th { background-color: #007bff; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .container { width: 100%; margin: auto; padding: 10px;}
+    .pagination { margin-top: 10px; text-align: center; }
+    .pagination a, .pagination span { margin: 0 5px; padding: 5px 10px; text-decoration: none; border: 1px solid #007bff; color: #007bff; border-radius: 4px; }
+    .pagination .current { background-color: #007bff; color: white; }
+
+    .containerX { height: 75dvh; overflow-x: auto}
+    .tableX {position: sticky;
+        top: calc(0.25rem * 0);
+        z-index: 1;}
+</style>
+
+
+<div class="max-w-screen-lg mx-auto p-4">
+    <div class="flex items-center m-2 gap-4">        
+        <h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl">
+        Snapshots
+        </h1>
+
+    </div>
+
+<div class="containerX bb-8">
+
+
+    
+        <table class="table-xs  table-pin-rows ">
+          <!-- head -->
+        <thead class="tableX">
+            <tr>
+                <th>ID</th>
+                <th>Timestamp</th>
+                <th>Author</th>
+                <th>Details</th>
+                <th>Export</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody id="process-table-body">
+            {% include 'partials/snap_table.html' %}
+
+        </tbody>
+    <table>
+
+
+
+
+
+
+
+
+</div>
+</div>
+
+
+{% endblock content %}

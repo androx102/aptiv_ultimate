@@ -1,0 +1,14 @@
+{% for snap in snapshots %}
+<!--class="hover:bg-base-100"-->
+<tr >
+    <td>{{ snap.snapshot_id }}</td>
+    <td>{{ snap.snapshot_timestamp }}</td>
+    <td>{{ snap.snapshot_author }}</td>
+    <td>        
+    <a href="?snap_id={{ snap.snapshot_id }}">Details</a>
+    </td>
+    <td>Export</td>
+    <td>Remove</td>
+</tr>
+{% endfor %}
+            

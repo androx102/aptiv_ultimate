@@ -3,10 +3,9 @@ from .models import *
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User_object
-        fields = ['id', 'username', 'password', 'user_role']
+        model = UserObject
+        fields = ['id', 'username', 'password', 'user_role', 'email']
         extra_kwargs = {
-            'username': {'write_only': True},
             'password': {'write_only': True},
             'id': {'read_only': True},
         }
@@ -18,3 +17,17 @@ class UserSerializer(serializers.ModelSerializer):
                 instance.set_password(password)
             instance.save()
             return instance
+
+
+
+class ProcessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcessObject
+        fields = '__all__'
+    
+
+        
+class SnapshotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SnapshotObject
+        fields = '__all__'

@@ -7,18 +7,29 @@ from rest_framework.views import APIView
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
 import pathlib
 from .auth_utlis import *
 from .serializers import *
+from .utils import *
 
 
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
+partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
 
 
-
-
+@api_view(['GET'])
+@permission_classes([AllowAny]) 
+def index(request):
+    status_, resp_ = auth_user(request)
+    if status_:
+        return render(request, f'{templates_dir}/index.html')
+    else:
+        return render(request, f'{templates_dir}/index.html',{'require_login': True})
+    
+    
 
 class Process_browser_view(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
@@ -26,31 +37,63 @@ class Process_browser_view(APIView):
     
     def get(self, request):
         status_, resp_ = auth_user(request)
+        status_ = True
         if status_:
-            return render(request, f'{templates_dir}/process_browser.html')
+            try:
+                
+                processes = get_process_info()
+                
+                if request.headers.get('HX-Request') == 'true':
+                    return render(request, f'{partials_dir}/proc_table.html', {'processes': processes})
+                else:
+                    return render(request, f'{templates_dir}/proc-browser.html', {'processes': processes})
+                           
+            except Exception as e:
+                return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+
         else:
             return redirect('/sign-in/') 
 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny]) 
-def Process_API(request):
-    
-    try:
-        pass
-        #1. Get processes list
-        #2. Serialize them
-        #3. Send serialized data
-        
-        #instance = Document_object.objects.filter(owner__id=request.user.id)
-        #serializer = DocumentSerializer(instance, many=True)
-        #return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"ERROR":"Not implemented"}, status=status.HTTP_200_OK)
-    
-    except Exception as e:
-        return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+def Process_API_snap(request):
+        status_, resp_ = auth_user(request)
+        status_ = True
+        if status_:
+            try:
+                
+                user_id = resp_
+                snapData = {"snapshot_author":user_id}              
+                
+                snap_serializer = SnapshotSerializer(data=snapData)
+                
+                if snap_serializer.is_valid():
+                    snap = snap_serializer.save()
+                else:
+                    print(snap_serializer.errors)
+                
+                processes = get_process_info()
+                
+                for proces in processes:
+                    proces['snapshot'] = snap.snapshot_id
+                    
+                serializer = ProcessSerializer(data=processes, many=True)
+                
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    print("snap git")
+                    return Response({"Message":"Snapshot created sucesfully"}, status=status.HTTP_200_OK)
+                else:
+                    
+                    return Response({"ERROR":"Issue with snapshot serializer"},status=status.HTTP_400_BAD_REQUEST)  
+                
+            except Exception as e:
+                return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -60,10 +103,32 @@ class Snapshot_browser_view(APIView):
     
     def get(self, request):
         status_, resp_ = auth_user(request)
+        status_ = True
         if status_:
-            return render(request, f'{templates_dir}/snapshot_browser.html')
+            try:
+                
+                snap_id = request.GET.get('snap_id')
+                
+                if snap_id is not None:
+                        try:
+                            snapshot = SnapshotObject.objects.get(snapshot_id=snap_id)
+                            processes = ProcessObject.objects.filter(snapshot=snapshot)
+                            return render(request, f'{templates_dir}/snap_details.html', {'snapshot': snapshot,'processes':processes})
+                        
+                        except Exception as e:
+                            return render(request, f'{templates_dir}/404.html',{'errors': e})
+                            
+                else:
+                    snapshots = SnapshotObject.objects.all()
+                    return render(request, f'{templates_dir}/snapshots.html',{'snapshots': snapshots})
+                           
+            except Exception as e:
+                return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return redirect('/sign-in/') 
+
+
+
 
    
 
@@ -75,7 +140,7 @@ class Kill_Log_browser_view(APIView):
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
-            return render(request, f'{templates_dir}/killlog_browser.html')
+            return render(request, f'{templates_dir}/kill-log.html')
         else:
             return redirect('/sign-in/') 
     
@@ -84,23 +149,30 @@ class Kill_Log_browser_view(APIView):
 ###########################################################################
 #Auth methods
 
- 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def Register_view(request):
-    #TODO:
-    #1.check if has valid cookies, if yes -> redirect    
+    status_, resp_ = auth_user(request)
+    if status_:
+        return render(request, f'{templates_dir}/index.html')
+    else:   
+        return render(request, f'{templates_dir}/sign-up.html',{'require_login': True})
     
-    return render(request, f'{templates_dir}/sign_up.html')
    
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny]) 
 def Register_API(request):
+    status_, resp_ = auth_user(request)
+    if status_:
+        return JsonResponse({"error": "User logged in"}, status=400)
+    
     try: 
+        print(request.data)
         serializer_ = UserSerializer(data=request.data)
+        
         if serializer_.is_valid():
             serializer_.save()
             return Response({"OK": "User created sucesfully"}, status=status.HTTP_201_CREATED)
@@ -115,18 +187,20 @@ def Register_API(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def Login_view(request):
-    #TODO:
-    #1.check if has valid cookies, if yes -> redirect    
-    
-    return render(request, f'{templates_dir}/sign_in.html')
+    status_, resp_ = auth_user(request)
+    if status_:
+        return render(request, f'{templates_dir}/index.html')
+    else:   
+        return render(request, f'{templates_dir}/sign-in.html',{'require_login': True})
 
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def Login_API(request):
-    #TODO:
-    #1.Return some html for frontend on fail
+    status_, resp_ = auth_user(request)
+    if status_:
+        return JsonResponse({"error": "Already logged"}, status=400)
     
     if request.method == "POST":
         username = request.POST.get("username")
@@ -135,13 +209,33 @@ def Login_API(request):
         user = authenticate(request, username=username, password=password)
         
         if user:
-            tokens = get_tokens_for_user(user)  # Generate JWT
+            tokens = get_tokens_for_user(user)  
             response = JsonResponse({"message": "Login successful"})
             response.set_cookie("access_token", tokens["access"], httponly=True, samesite="Strict", secure=True)
             response.set_cookie("refresh_token", tokens["refresh"], httponly=True, samesite="Strict", secure=True)
-            response["HX-Redirect"] = "/proc-browser/"
+            response["HX-Redirect"] = "/"
             return response
         else:
             return JsonResponse({"error": "Invalid credentials"}, status=400)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def Log_out_API(request):
+    status_, resp_ = auth_user(request)
+    if status_:
+        
+        status_2, resp_2 = ban_token(request)
+        if status_2:
+            response = render(request, f'{templates_dir}/logout.html', {'require_login': True})
+            response.delete_cookie("access_token")
+            response.delete_cookie("refresh_token")
+            return response
+        else:
+            return render(request, f'{templates_dir}/index.html',{'require_login': True})
+    else:   
+        return render(request, f'{templates_dir}/index.html',{'require_login': True})
+        

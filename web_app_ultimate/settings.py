@@ -69,7 +69,7 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY
 }
 
-AUTH_USER_MODEL = 'backend_main.User_object'
+AUTH_USER_MODEL = 'backend_main.UserObject'
 
 LOGIN_URL = "/sign-in/"
 

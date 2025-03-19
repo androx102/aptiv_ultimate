@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block head_title %} Sign In {% endblock %}
+
+{% block content %}
+{% include 'partials/navbar.html' %}
+<div class="max-w-screen-lg mx-auto p-4">
+    <h1 class="mt-4 mb-6 text-2xl leading-none tracking-tight text-white md:text-3xl lg:text-4xl">
+        Sign In
+    </h1>
+    <div class="container">
+
+
+        <form id="login-form"  >
+
+            <div class="w-full min-h-screen flex items-center justify-center"> 
+                <fieldset class="fieldset w-xs bg-base-200 border border-base-300 p-4 rounded-box"> <!--hx-target="#error-container"-->
+                    <legend class="fieldset-legend">Sign In</legend>
+                    
+                    <label class="fieldset-label">Username</label>
+                    <input type="username" id="Username_id" name="username" class="input" placeholder="Username" />
+                    
+                    <label class="fieldset-label">Password</label>
+                    <input type="password" id="Password_id" name="password" class="input" placeholder="Password" />
+                    
+                    <button class="btn btn-neutral mt-4" hx-post="/API/sign-in/" hx-include="#Username_id, #Password_id"
+                        hx-target="#result-container" >
+                         Sign In
+                    </button>
+                    <div id="result-container"></div>
+                    <p>Don't have an account yet? <a href="/sign-up" class="font-semibold">Sign Up</a></p>
+                  </fieldset>
+            </div>
+    
+    
+    
+            <script>
+                document.body.addEventListener("htmx:afterRequest", function(event) {
+                    if (event.detail.xhr.status === 200) {
+                        const redirectUrl = event.detail.xhr.getResponseHeader("HX-Redirect");
+                        if (redirectUrl) {
+                            window.location.href = redirectUrl; 
+                        }
+                    }
+                });
+            </script>
+</div>
+</div>
+
+
+{% endblock content %}

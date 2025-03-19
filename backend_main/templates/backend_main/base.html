@@ -1,37 +1,32 @@
 {% load static tailwind_tags %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-    	<title>{% block title %} Django Tailwind {% endblock %}</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-		<!-- Loading Tailwind and HTMX -->
-		{% tailwind_css %}
-		{% load static %}
-		<script src="{% static 'htmx.min.js' %}"></script>
-	</head>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block head_title %}
+            APTIV ULTIMATE APP
+        {% endblock %}
+    </title>
 
 
+    <!-- HTMX -->{% tailwind_css %}
+    <script src="{% static 'htmx.min.js' %}"></script>
 
-	<body class="font-serif leading-normal tracking-normal">
-  
+    <!-- Custom files -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
 
-    <!-- Main Content -->
-    <div class="flex">
-        
-		<!-- Sidebar -->
-		{% include "partials/sidebar.html" %}
 
-        <!-- Main content-->
-		<div class="p-7 flex-grow"> 
-        {% block content %}
-        {% endblock content %}
-		</div>
+    {% block extra_head %}
+    {% endblock %}
     
-    </div>
-		  
-	</body>
+</head>
+<body>
+    {% block content %}
+    {% endblock %}  
+</body>
 </html>
