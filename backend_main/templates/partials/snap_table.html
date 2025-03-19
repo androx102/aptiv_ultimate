@@ -5,10 +5,11 @@
     <td>{{ snap.snapshot_timestamp }}</td>
     <td>{{ snap.snapshot_author }}</td>
     <td>        
-    <a href="?snap_id={{ snap.snapshot_id }}">Details</a>
+        <button class="btn btn-sm"><a href="?snap_id={{ snap.snapshot_id }}">Details</a></button>
+
     </td>
-    <td>Export</td>
-    <td>Remove</td>
+    <td><button class="btn btn-sm">Export</button></td>
+    <td><button class="btn btn-sm">Remove</button></td>
 </tr>
 {% endfor %}
             

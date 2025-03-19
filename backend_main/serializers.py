@@ -31,3 +31,9 @@ class SnapshotSerializer(serializers.ModelSerializer):
     class Meta:
         model = SnapshotObject
         fields = '__all__'
+        
+        
+class KillLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KillLog_object
+        fields = '__all__'

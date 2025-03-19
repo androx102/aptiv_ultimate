@@ -39,15 +39,16 @@ class ProcessObject(models.Model):
     process_memory_usage = models.FloatField()
     process_cpu_usage = models.FloatField(help_text="CPU usage percentage")
 
-    # Each process belongs to only ONE snapshot
     snapshot = models.ForeignKey(SnapshotObject, on_delete=models.CASCADE, related_name="processes")
 
     def __str__(self):
         return f"{self.process_name} (ID: {self.process_id})"
 
-#class KillLog_object(models.Model):
-#    KillLog_ID = uid ?
-#    KillLog_Timestamp = datetime
-#    KillLog_Author = charfield | one to many -> User_Name 
-#    KillLog_Process_Name = charfield | one to many -> Process_ID. 
-#    KillLog_Status = 0
+
+class KillLog_object(models.Model):
+    KillLog_ID = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    KillLog_Timestamp = models.DateTimeField(auto_now_add=True)
+    KillLog_Author = models.ForeignKey(UserObject, on_delete=models.CASCADE, related_name="kills") 
+    KillLog_Process_Name = models.CharField(max_length=255)
+    KillLog_Process_Id = models.IntegerField(default=1000)
+

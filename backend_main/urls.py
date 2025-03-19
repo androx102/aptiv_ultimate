@@ -18,7 +18,7 @@ urlpatterns = [
     path('API/processes/snap/', Process_API_snap, name="take_snapshot"),
        
     # 3. Kill process -> return json
-    #path('API/processes/<str:id>', Process_API, name="kill_proc"),
+    path('API/processes/kill/', Process_API_kill, name="kill_proc"),
     
     
     

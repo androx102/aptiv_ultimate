@@ -97,6 +97,45 @@ def Process_API_snap(request):
 
 
 
+@api_view(['POST'])
+@permission_classes([AllowAny]) 
+def Process_API_kill(request):
+        status_, resp_ = auth_user(request)
+        status_ = True
+        if status_:
+            try:
+                pid = request.POST.get("pid")
+                proc_name = request.POST.get("proc_name")
+                if pid == None or proc_name == None:
+                    return Response({"ERROR":"Must provide PID"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                user_id = resp_
+
+                killLogData = {
+                    "KillLog_Author" : user_id,
+                    "KillLog_Process_Name" : proc_name,
+                    "KillLog_Process_Id" : pid
+                    }              
+
+                kill_log_serializer = KillLogSerializer(data=killLogData)
+
+                if kill_log_serializer.is_valid():
+                    
+                    #try to kill motherfucker here
+                    
+                    kill_log = kill_log_serializer.save()
+                else:
+                    print(kill_log_serializer.errors)
+
+                #print(f"killed {pid}")
+                return Response({"Message":f"Killed process with PID: {pid}, Name: {proc_name}"}, status=status.HTTP_200_OK)
+            except Exception as e:    
+                return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 class Snapshot_browser_view(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [AllowAny]
@@ -140,7 +179,8 @@ class Kill_Log_browser_view(APIView):
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
-            return render(request, f'{templates_dir}/kill-log.html')
+            kills = KillLog_object.objects.all()
+            return render(request, f'{templates_dir}/kill-log.html', {'kills': kills})
         else:
             return redirect('/sign-in/') 
     

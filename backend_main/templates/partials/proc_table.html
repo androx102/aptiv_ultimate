@@ -8,7 +8,11 @@
     <td>{{ process.process_name }}</td>
     <td>{{ process.process_memory_usage }}</td>
     <td>{{ process.process_cpu_usage }}</td>
-    <td>Kill motherfucker</td>
+    <td><button class="btn btn-sm" hx-post="{% url 'kill_proc' %}" hx-vals='{"pid": {{process.process_id}}, "proc_name": "{{process.process_name}}" }' hx-swap="none">Kill</button></td>
+    
 </tr>
+
+<!--hx-include="#PID_{{process.process_id}}""-->
+
 {% endfor %}
             

@@ -1,0 +1,12 @@
+{% for kill in kills %}
+<!--class="hover:bg-base-100"-->
+<tr >
+    <td>{{ kill.KillLog_ID }}</td>
+    <td>{{ kill.KillLog_Timestamp }}</td>
+    <td>{{ kill.KillLog_Process_Id }}</td>
+    <td>{{ kill.KillLog_Process_Name }}</td>
+    <td>{{ kill.KillLog_Author }}</td>
+    <td><button class="btn btn-sm">Remove</button></td>
+</tr>
+{% endfor %}
+            
