@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 import pathlib
@@ -148,7 +148,7 @@ class Snapshot_browser_view(APIView):
                 
                 snap_id = request.GET.get('snap_id')
                 
-                if snap_id is not None:
+                if snap_id != None:
                         try:
                             snapshot = SnapshotObject.objects.get(snapshot_id=snap_id)
                             processes = ProcessObject.objects.filter(snapshot=snapshot)
@@ -167,9 +167,50 @@ class Snapshot_browser_view(APIView):
             return redirect('/sign-in/') 
 
 
+    def delete(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            
+            snapshot_id = request.data.get('snapshot_id')  
+                    
+            if snapshot_id == None:
+                return Response({"ERROR": "Snapshot ID not provided"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                snapshot = get_object_or_404(SnapshotObject, snapshot_id=snapshot_id)
+                snapshot.delete()
+                return Response({"OK": "Snapshot removed"}, status=status.HTTP_200_OK)
+            
+            except Exception as e:
+                return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        else:
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-   
+@api_view(['GET'])
+@permission_classes([AllowAny]) 
+def Snapshot_API_export(request):
+        status_, resp_ = auth_user(request)
+        status_ = True
+        if status_:
+            try:
+                
+                snap_id = request.GET.get('snap_id')
+                if snap_id == None:
+                    return Response({"ERROR": "Snapshot ID not provided"}, status=status.HTTP_400_BAD_REQUEST)
+                
+                status_, resp_ = create_excel(snap_id)
+                if status_ != True:
+                    return Response({"ERROR":f"{resp_}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)       
+
+                return resp_
+            except Exception as e:    
+                return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 class Kill_Log_browser_view(APIView):
@@ -183,6 +224,26 @@ class Kill_Log_browser_view(APIView):
             return render(request, f'{templates_dir}/kill-log.html', {'kills': kills})
         else:
             return redirect('/sign-in/') 
+        
+        
+    def delete(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            
+            kill_id = request.data.get('kill_id')          
+            if kill_id == None:
+                return Response({"ERROR": "Kill entry ID not provided"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                kill_entry = get_object_or_404(KillLog_object, KillLog_ID=kill_id)
+                kill_entry.delete()
+                return Response({"OK": "Kill entry removed"}, status=status.HTTP_200_OK)
+            
+            except Exception as e:
+                return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        else:
+            return Response({"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
 
@@ -210,7 +271,6 @@ def Register_API(request):
         return JsonResponse({"error": "User logged in"}, status=400)
     
     try: 
-        print(request.data)
         serializer_ = UserSerializer(data=request.data)
         
         if serializer_.is_valid():

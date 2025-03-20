@@ -25,14 +25,10 @@ urlpatterns = [
     
     #Snapshot browser
     # 1. Display page -> return htmx
-    path('snapshots/', Snapshot_browser_view.as_view(), name="snapshots"),
-    
-    # 2. Remove snapshot
-    #path('API/snap/del/<str:id>', Process_API_snap, name="del_snap"),
-    
-    
-    # 3. Export to excel -> return file 
-    #path('API/snap/excel/<str:id>', Process_API_snap, name="export_snap"),
+    path('snapshots/', Snapshot_browser_view.as_view(), name="snapshots"),   
+       
+    # 2. Export to excel -> return file 
+    path('API/snap/excel/', Snapshot_API_export, name="export_snap"),
     
     
     #Kill log interface

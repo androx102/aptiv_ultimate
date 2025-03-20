@@ -8,8 +8,19 @@
         <button class="btn btn-sm"><a href="?snap_id={{ snap.snapshot_id }}">Details</a></button>
 
     </td>
-    <td><button class="btn btn-sm">Export</button></td>
-    <td><button class="btn btn-sm">Remove</button></td>
+    <td>
+        <button class="btn btn-sm"><a href="{% url 'export_snap' %}?snap_id={{ snap.snapshot_id }}">
+            Download
+        </a>
+        </button>         
+    </td>
+    <td><button class="btn btn-sm" hx-delete="{% url 'snapshots' %}" hx-swap="none"
+        hx-vals='{"snapshot_id": "{{snap.snapshot_id}}" }'>
+        Remove
+    </button>
+    </td>
 </tr>
+</tr>
+
 {% endfor %}
             

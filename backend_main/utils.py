@@ -1,5 +1,8 @@
 import psutil
 import datetime
+import openpyxl
+from django.http import JsonResponse, HttpResponse
+from .models import *
 import json
 
 def get_process_info():
@@ -22,3 +25,40 @@ def get_process_info():
             continue
 
     return process_list 
+
+
+def create_excel(snap_id):
+    try:
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Snapshot details"
+
+
+        ws.append(["PID",
+                   "Status",
+                   "Start time",
+                   "Duration",
+                   "Name",
+                   "Memory usage",
+                   "CPU usage",
+                   ]) 
+
+        processes = ProcessObject.objects.filter(snapshot__snapshot_id=snap_id)  
+
+        for proc in list(processes.values()):
+            ws.append([proc["process_id"],
+                       proc["process_status"],
+                       proc["process_start_time"].replace(tzinfo=None),
+                       proc["process_duration"],
+                       proc["process_name"],
+                       proc["process_memory_usage"],
+                       proc["process_cpu_usage"],
+                       ])  
+        
+        response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response["Content-Disposition"] = f'attachment; filename="snapshot_{snap_id}.xlsx"'
+        wb.save(response)
+        return True, response
+    except Exception as e:
+        return False, e
+    

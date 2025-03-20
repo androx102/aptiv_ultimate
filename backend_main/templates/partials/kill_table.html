@@ -6,7 +6,9 @@
     <td>{{ kill.KillLog_Process_Id }}</td>
     <td>{{ kill.KillLog_Process_Name }}</td>
     <td>{{ kill.KillLog_Author }}</td>
-    <td><button class="btn btn-sm">Remove</button></td>
+    <td><button class="btn btn-sm" hx-delete="{% url 'kill-log' %}" hx-swap="none"
+        hx-vals='{"kill_id": "{{kill.KillLog_ID}}" }'>
+        Remove</button></td>
 </tr>
 {% endfor %}
             
