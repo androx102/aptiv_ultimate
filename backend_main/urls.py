@@ -1,18 +1,18 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenBlacklistView
 from .views import *
 
 
 
 urlpatterns = [
     
-    #Index
+    #Index page
     path("", index, name='index'),
     
     
     #Process browser
-    # 1. Display page -> return htmx
+    # 1. Display page and processes data table -> return htmx
     path('processes/', Process_browser_view.as_view(), name="processes"),
+    
     
     # 2. Take snapshot -> return json
     path('API/processes/snap/', Process_API_snap, name="take_snapshot"),
@@ -31,29 +31,29 @@ urlpatterns = [
     path('API/snap/excel/', Snapshot_API_export, name="export_snap"),
     
     
+    
+    
     #Kill log interface
     # 1. Display page -> return htmx
     path('kill-log/', Kill_Log_browser_view.as_view(), name="kill-log"),
-    
-
     
     
     
     #Auth
     # 1. Sign-in page -> return htmx
-    path('sign-in/', Login_view, name="sign-in"),
+    path('sign-in/', Login_view, name="sign_in"),
     
     # 2. Sign-in endpoint -> retunr json
-    path('API/sign-in/', Login_API, name="JWT obtain endpoint"),
+    path('API/sign-in/', Login_API, name="sign_in_api"),
     
     # 3. Refresh token endpoint -> return json //Even needed ?!?
  
     
     # 4. Sign-up page -> -> return htmx
-    path('sign-up/', Register_view, name="sign-up"),
+    path('sign-up/', Register_view, name="sign_up"),
     
     # 5. Sign-up endpoint -> retunr json
-    path('API/sign-up/', Register_API, name="Sign-UP endpoint"),
+    path('API/sign-up/', Register_API, name="sign_up_api"),
     
     # 6. Logout 
     path('API/log-out/', Log_out_API, name="logout"),

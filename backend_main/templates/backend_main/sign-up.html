@@ -27,12 +27,12 @@
                 <label class="fieldset-label">Repeat password</label>
                 <input type="password" id="Rpassword_id" name="rpassword" class="input" placeholder="Password" />
                 
-                <button class="btn btn-neutral mt-4" hx-post="/API/sign-up/" hx-include="#Username_id, #Password_id, #Rpassword_id, #Email_id"
+                <button class="btn btn-neutral mt-4" hx-post="{% url 'sign_up_api' %}" hx-include="#Username_id, #Password_id, #Rpassword_id, #Email_id"
                 hx-target="#result-container">
                      Sign up
                 </button>
                 <div id="result-container"></div>
-                <p>Already have account? <a href="/sign-in" class="font-semibold">Sign In</a></p>
+                <p>Already have account? <a href="{% url 'sign_in' %}" class="font-semibold">Sign In</a></p>
               </fieldset>
         </div>
 </div>

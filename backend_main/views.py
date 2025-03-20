@@ -1,14 +1,11 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator
 import pathlib
 from .auth_utlis import *
 from .serializers import *
@@ -21,7 +18,6 @@ partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny]) 
 def index(request):
     status_, resp_ = auth_user(request)
     if status_:
@@ -31,18 +27,12 @@ def index(request):
     
     
 
-class Process_browser_view(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [AllowAny]
-    
+class Process_browser_view(APIView):    
     def get(self, request):
         status_, resp_ = auth_user(request)
-        status_ = True
         if status_:
             try:
-                
                 processes = get_process_info()
-                
                 if request.headers.get('HX-Request') == 'true':
                     return render(request, f'{partials_dir}/proc_table.html', {'processes': processes})
                 else:
@@ -51,16 +41,13 @@ class Process_browser_view(APIView):
             except Exception as e:
                 return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-
         else:
             return redirect('/sign-in/') 
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny]) 
 def Process_API_snap(request):
         status_, resp_ = auth_user(request)
-        status_ = True
         if status_:
             try:
                 
@@ -87,21 +74,18 @@ def Process_API_snap(request):
                     print("snap git")
                     return Response({"Message":"Snapshot created sucesfully"}, status=status.HTTP_200_OK)
                 else:
-                    
                     return Response({"ERROR":"Issue with snapshot serializer"},status=status.HTTP_400_BAD_REQUEST)  
                 
             except Exception as e:
                 return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny]) 
 def Process_API_kill(request):
         status_, resp_ = auth_user(request)
-        status_ = True
         if status_:
             try:
                 pid = request.POST.get("pid")
@@ -127,22 +111,17 @@ def Process_API_kill(request):
                 else:
                     print(kill_log_serializer.errors)
 
-                #print(f"killed {pid}")
                 return Response({"Message":f"Killed process with PID: {pid}, Name: {proc_name}"}, status=status.HTTP_200_OK)
             except Exception as e:    
                 return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 
-class Snapshot_browser_view(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [AllowAny]
-    
+class Snapshot_browser_view(APIView):   
     def get(self, request):
         status_, resp_ = auth_user(request)
-        status_ = True
         if status_:
             try:
                 
@@ -185,14 +164,12 @@ class Snapshot_browser_view(APIView):
                 return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
             
         else:
-            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny]) 
 def Snapshot_API_export(request):
         status_, resp_ = auth_user(request)
-        status_ = True
         if status_:
             try:
                 
@@ -208,15 +185,12 @@ def Snapshot_API_export(request):
             except Exception as e:    
                 return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response({"ERROR":"Auth error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 
 
-class Kill_Log_browser_view(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [AllowAny]
-    
+class Kill_Log_browser_view(APIView):    
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -243,7 +217,7 @@ class Kill_Log_browser_view(APIView):
                 return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
             
         else:
-            return Response({"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"ERROR":"Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
     
 
 
@@ -252,7 +226,6 @@ class Kill_Log_browser_view(APIView):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def Register_view(request):
     status_, resp_ = auth_user(request)
     if status_:
@@ -264,11 +237,10 @@ def Register_view(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny]) 
 def Register_API(request):
     status_, resp_ = auth_user(request)
     if status_:
-        return JsonResponse({"error": "User logged in"}, status=400)
+        return Response({"ERROR":"User logged in"}, status=status.HTTP_403_FORBIDDEN)
     
     try: 
         serializer_ = UserSerializer(data=request.data)
@@ -285,7 +257,6 @@ def Register_API(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def Login_view(request):
     status_, resp_ = auth_user(request)
     if status_:
@@ -296,34 +267,30 @@ def Login_view(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def Login_API(request):
     status_, resp_ = auth_user(request)
     if status_:
-        return JsonResponse({"error": "Already logged"}, status=400)
+        return Response({"ERROR":"User already logged in"}, status=status.HTTP_403_FORBIDDEN)
     
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        user = authenticate(request, username=username, password=password)
-        
-        if user:
-            tokens = get_tokens_for_user(user)  
-            response = JsonResponse({"message": "Login successful"})
-            response.set_cookie("access_token", tokens["access"], httponly=True, samesite="Strict", secure=True)
-            response.set_cookie("refresh_token", tokens["refresh"], httponly=True, samesite="Strict", secure=True)
-            response["HX-Redirect"] = "/"
-            return response
-        else:
-            return JsonResponse({"error": "Invalid credentials"}, status=400)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    user = authenticate(request, username=username, password=password)
+    
+    if user:
+        tokens = get_tokens_for_user(user)  
+        response = JsonResponse({"message": "Login successful"})
+        response.set_cookie("access_token", tokens["access"], httponly=True, samesite="Strict", secure=True)
+        response.set_cookie("refresh_token", tokens["refresh"], httponly=True, samesite="Strict", secure=True)
+        response["HX-Redirect"] = "/"
+        return response
+    else:
+        return Response({"ERROR":"Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    
 
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def Log_out_API(request):
     status_, resp_ = auth_user(request)
     if status_:

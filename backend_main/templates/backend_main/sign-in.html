@@ -23,12 +23,12 @@
                     <label class="fieldset-label">Password</label>
                     <input type="password" id="Password_id" name="password" class="input" placeholder="Password" />
                     
-                    <button class="btn btn-neutral mt-4" hx-post="/API/sign-in/" hx-include="#Username_id, #Password_id"
+                    <button class="btn btn-neutral mt-4" hx-post="{% url 'sign_in_api' %}" hx-include="#Username_id, #Password_id"
                         hx-target="#result-container" >
                          Sign In
                     </button>
                     <div id="result-container"></div>
-                    <p>Don't have an account yet? <a href="/sign-up" class="font-semibold">Sign Up</a></p>
+                    <p>Don't have an account yet? <a href="{% url 'sign_up' %}" class="font-semibold">Sign Up</a></p>
                   </fieldset>
             </div>
     

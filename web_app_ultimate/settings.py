@@ -51,11 +51,11 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+       #"rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-        'rest_framework.permissions.AllowAny',  # Public access
+       # "rest_framework.permissions.IsAuthenticated",
+        #'rest_framework.permissions.AllowAny',  # Public access
     ],
 }
 
@@ -71,7 +71,7 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = 'backend_main.UserObject'
 
-LOGIN_URL = "/sign-in/"
+
 
 TAILWIND_APP_NAME = 'theme'
 
@@ -87,7 +87,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #"backend_main.middleware.JWTAuthenticationMiddleware", 
 ]
 
 ROOT_URLCONF = 'web_app_ultimate.urls'
