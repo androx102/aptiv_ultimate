@@ -15,6 +15,7 @@ def get_tokens_for_user(user):
     
     
 def auth_user(request):
+    #Get acess token from cookies
     token = request.COOKIES.get("access_token")
 
     if not token:

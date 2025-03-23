@@ -951,45 +951,6 @@ select {
   }
 }
 
-.swap {
-  position: relative;
-  display: inline-grid;
-  cursor: pointer;
-  place-content: center;
-  vertical-align: middle;
-  webkit-user-select: none;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
-}
-
-.swap input {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  border: none;
-}
-
-.swap > * {
-  grid-column-start: 1;
-  grid-row-start: 1;
-  transition-property: transform, rotate, opacity;
-  transition-duration: 0.2s;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-}
-
-.swap .swap-on, .swap .swap-indeterminate, .swap input:indeterminate ~ .swap-on {
-  opacity: 0%;
-}
-
-.swap input:is(:checked, :indeterminate) ~ .swap-off {
-  opacity: 0%;
-}
-
-.swap input:checked ~ .swap-on, .swap input:indeterminate ~ .swap-indeterminate {
-  opacity: 100%;
-}
-
 .btn {
   display: inline-flex;
   flex-shrink: 0;

@@ -27,6 +27,44 @@ def get_process_info():
     return process_list 
 
 
+def kill_proc_by_id(pid):
+    
+    try:
+        
+        #Get proc to kill by PID
+        proc_to_kill = psutil.Process(pid)
+        
+        #Get his children
+        children = proc_to_kill.children(recursive=True)
+        
+        #Send termination signal to children
+        for proc in children:
+            proc.terminate()
+            
+        #Check if chldren terminated            
+        _, survivors = psutil.wait_procs(children, timeout=5)
+        
+        
+        #LET THEM DIE!
+        for survivor in survivors:
+            survivor.kill()
+            
+        #Kill main proc
+        try:
+            proc_to_kill.terminate()
+            proc_to_kill.wait(5)
+        except psutil.TimeoutExpired:
+            proc_to_kill.kill()
+        
+        return True, "Proc killed sucesfully"
+        
+        
+    except Exception as e:
+        return False, f"{e}"
+    
+    
+    
+
 def create_excel(snap_id):
     try:
         wb = openpyxl.Workbook()

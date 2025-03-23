@@ -104,14 +104,18 @@ def Process_API_kill(request):
                 kill_log_serializer = KillLogSerializer(data=killLogData)
 
                 if kill_log_serializer.is_valid():
+                    status_, message_ =  kill_proc_by_id(pid)
                     
-                    #try to kill motherfucker here
+                    if status_:
+                        kill_log = kill_log_serializer.save()
+                    else:
+                        raise Exception(message_)
                     
-                    kill_log = kill_log_serializer.save()
                 else:
-                    print(kill_log_serializer.errors)
+                    raise Exception(kill_log_serializer.errors)
 
                 return Response({"Message":f"Killed process with PID: {pid}, Name: {proc_name}"}, status=status.HTTP_200_OK)
+            
             except Exception as e:    
                 return Response({"ERROR":f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
