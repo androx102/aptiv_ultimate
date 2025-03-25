@@ -3,13 +3,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import pathlib
-from .auth_utlis import *
-from .serializers import *
-from .utils import *
+from models import ProcessObject, SnapshotObject, KillLog_object
+from .auth_utlis import ban_token, auth_user, get_tokens_for_user
+from .serializers import UserSerializer, ProcessSerializer, SnapshotSerializer, KillLogSerializer
+from .utils import get_process_info, kill_proc_by_id, create_excel
 
 
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"

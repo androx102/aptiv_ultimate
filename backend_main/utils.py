@@ -1,9 +1,9 @@
 import psutil
 import datetime
 import openpyxl
-from django.http import JsonResponse, HttpResponse
-from .models import *
-import json
+from django.http import HttpResponse
+from .models import ProcessObject 
+
 
 def get_process_info():
     process_list = []

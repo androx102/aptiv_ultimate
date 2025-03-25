@@ -1,0 +1,3 @@
+.ruff_cache/
+*/migrations/
+*/__pycache__/

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import *
+from .models import UserObject, ProcessObject, SnapshotObject, KillLog_object
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

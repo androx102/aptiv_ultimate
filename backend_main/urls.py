@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import *
+from .views import index, Process_browser_view, Process_API_snap, Process_API_kill, Snapshot_browser_view, Snapshot_API_export, Kill_Log_browser_view, Log_out_API, Login_API, Register_API, Register_view, Login_view
 
 
 
