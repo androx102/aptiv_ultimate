@@ -25,3 +25,8 @@ jobs:
 
       - name: Run formatting
         run: ruff format
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'style fixes by ruff'
