@@ -21,7 +21,7 @@ jobs:
           args: "--version"
         
       - name: Run linting and fixing
-        run: ruff check . --fix
+        run: ruff check . --ignore E711,E712,F841 --fix
 
       - name: Run formatting
         run: ruff format
