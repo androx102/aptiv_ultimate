@@ -22,13 +22,14 @@ templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
 
-@api_view(["GET"])
-def index(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        return render(request, f"{templates_dir}/index.html")
-    else:
-        return render(request, f"{templates_dir}/index.html", {"require_login": True})
+
+class index(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            return render(request, f"{templates_dir}/index.html")
+        else:
+            return render(request, f"{templates_dir}/index.html", {"require_login": True})
 
 
 class Process_browser_view(APIView):
@@ -59,94 +60,96 @@ class Process_browser_view(APIView):
             return redirect("/sign-in/")
 
 
-@api_view(["GET"])
-def Process_API_snap(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        try:
-            user_id = resp_
-            snapData = {"snapshot_author": user_id}
 
-            snap_serializer = SnapshotSerializer(data=snapData)
+class Process_API_snap(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            try:
+                user_id = resp_
+                snapData = {"snapshot_author": user_id}
 
-            if snap_serializer.is_valid():
-                snap = snap_serializer.save()
-            else:
-                print(snap_serializer.errors)
+                snap_serializer = SnapshotSerializer(data=snapData)
 
-            processes = get_process_info()
+                if snap_serializer.is_valid():
+                    snap = snap_serializer.save()
+                else:
+                    print(snap_serializer.errors)
 
-            for proces in processes:
-                proces["snapshot"] = snap.snapshot_id
+                processes = get_process_info()
 
-            serializer = ProcessSerializer(data=processes, many=True)
+                for proces in processes:
+                    proces["snapshot"] = snap.snapshot_id
 
-            if serializer.is_valid():
-                serializer.save()
-                print("snap git")
+                serializer = ProcessSerializer(data=processes, many=True)
+
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(
+                        {"Message": "Snapshot created sucesfully"},
+                        status=status.HTTP_200_OK,
+                    )
+                else:
+                    return Response(
+                        {"ERROR": "Issue with snapshot serializer"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+            except Exception as e:
                 return Response(
-                    {"Message": "Snapshot created sucesfully"},
+                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        else:
+            return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+ 
+
+class Process_API_kill(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            try:
+                pid = request.POST.get("pid")
+                proc_name = request.POST.get("proc_name")
+                if pid == None or proc_name == None:
+                    return Response(
+                        {"ERROR": "Must provide PID"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    )
+
+                user_id = resp_
+
+                killLogData = {
+                    "KillLog_Author": user_id,
+                    "KillLog_Process_Name": proc_name,
+                    "KillLog_Process_Id": pid,
+                }
+
+                kill_log_serializer = KillLogSerializer(data=killLogData)
+
+                if kill_log_serializer.is_valid():
+                    status_, message_ = kill_proc_by_id(pid)
+
+                    if status_:
+                        kill_log = kill_log_serializer.save()
+                    else:
+                        raise Exception(message_)
+
+                else:
+                    raise Exception(kill_log_serializer.errors)
+
+                return Response(
+                    {"Message": f"Killed process with PID: {pid}, Name: {proc_name}"},
                     status=status.HTTP_200_OK,
                 )
-            else:
+
+            except Exception as e:
                 return Response(
-                    {"ERROR": "Issue with snapshot serializer"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-
-        except Exception as e:
-            return Response(
-                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    else:
-        return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-@api_view(["POST"])
-def Process_API_kill(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        try:
-            pid = request.POST.get("pid")
-            proc_name = request.POST.get("proc_name")
-            if pid == None or proc_name == None:
-                return Response(
-                    {"ERROR": "Must provide PID"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
-
-            user_id = resp_
-
-            killLogData = {
-                "KillLog_Author": user_id,
-                "KillLog_Process_Name": proc_name,
-                "KillLog_Process_Id": pid,
-            }
-
-            kill_log_serializer = KillLogSerializer(data=killLogData)
-
-            if kill_log_serializer.is_valid():
-                status_, message_ = kill_proc_by_id(pid)
-
-                if status_:
-                    kill_log = kill_log_serializer.save()
-                else:
-                    raise Exception(message_)
-
-            else:
-                raise Exception(kill_log_serializer.errors)
-
-            return Response(
-                {"Message": f"Killed process with PID: {pid}, Name: {proc_name}"},
-                status=status.HTTP_200_OK,
-            )
-
-        except Exception as e:
-            return Response(
-                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    else:
-        return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class Snapshot_browser_view(APIView):
@@ -211,31 +214,45 @@ class Snapshot_browser_view(APIView):
             )
 
 
-@api_view(["GET"])
-def Snapshot_API_export(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        try:
-            snap_id = request.GET.get("snap_id")
-            if snap_id == None:
-                return Response(
-                    {"ERROR": "Snapshot ID not provided"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
 
-            status_, resp_ = create_excel(snap_id)
-            if status_ != True:
-                return Response(
-                    {"ERROR": f"{resp_}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
 
-            return resp_
-        except Exception as e:
-            return Response(
-                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    else:
-        return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+
+
+
+
+
+
+
+
+class Snapshot_API_export(request):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            try:
+                snap_id = request.GET.get("snap_id")
+                if snap_id == None:
+                    return Response(
+                        {"ERROR": "Snapshot ID not provided"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                status_, resp_ = create_excel(snap_id)
+                if status_ != True:
+                    return Response(
+                        {"ERROR": f"{resp_}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+
+                return resp_
+            except Exception as e:
+                return Response(
+                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        else:
+            return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class Kill_Log_browser_view(APIView):
@@ -275,98 +292,107 @@ class Kill_Log_browser_view(APIView):
 # Auth methods
 
 
-@api_view(["GET"])
-def Register_view(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        return render(request, f"{templates_dir}/index.html")
-    else:
-        return render(request, f"{templates_dir}/sign-up.html", {"require_login": True})
+
+ 
 
 
-@api_view(["POST"])
-def Register_API(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        return Response({"ERROR": "User logged in"}, status=status.HTTP_403_FORBIDDEN)
 
-    try:
-        serializer_ = UserSerializer(data=request.data)
-
-        if serializer_.is_valid():
-            serializer_.save()
-            return Response(
-                {"OK": "User created sucesfully"}, status=status.HTTP_201_CREATED
-            )
+class Register_view(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            return render(request, f"{templates_dir}/index.html")
         else:
+            return render(request, f"{templates_dir}/sign-up.html", {"require_login": True})
+
+
+class Register_API(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            return Response({"ERROR": "User logged in"}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            serializer_ = UserSerializer(data=request.data)
+
+            if serializer_.is_valid():
+                serializer_.save()
+                return Response(
+                    {"OK": "User created sucesfully"}, status=status.HTTP_201_CREATED
+                )
+            else:
+                return Response(
+                    {"ERROR": f"{serializer_.errors}"}, status=status.HTTP_400_BAD_REQUEST
+                )
+        except Exception as e:
+            return Response({"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class Login_view(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            return render(request, f"{templates_dir}/index.html")
+        else:
+            return render(request, f"{templates_dir}/sign-in.html", {"require_login": True})
+
+
+
+class Login_API(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
             return Response(
-                {"ERROR": f"{serializer_.errors}"}, status=status.HTTP_400_BAD_REQUEST
+                {"ERROR": "User already logged in"}, status=status.HTTP_403_FORBIDDEN
             )
-    except Exception as e:
-        return Response({"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
 
-@api_view(["GET"])
-def Login_view(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        return render(request, f"{templates_dir}/index.html")
-    else:
-        return render(request, f"{templates_dir}/sign-in.html", {"require_login": True})
-
-
-@api_view(["POST"])
-def Login_API(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        return Response(
-            {"ERROR": "User already logged in"}, status=status.HTTP_403_FORBIDDEN
-        )
-
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-    user = authenticate(request, username=username, password=password)
-
-    if user:
-        tokens = get_tokens_for_user(user)
-        response = JsonResponse({"message": "Login successful"})
-        response.set_cookie(
-            "access_token",
-            tokens["access"],
-            httponly=True,
-            samesite="Strict",
-            secure=True,
-        )
-        response.set_cookie(
-            "refresh_token",
-            tokens["refresh"],
-            httponly=True,
-            samesite="Strict",
-            secure=True,
-        )
-        response["HX-Redirect"] = "/"
-        return response
-    else:
-        return Response(
-            {"ERROR": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
-        )
-
-
-@api_view(["GET"])
-def Log_out_API(request):
-    status_, resp_ = auth_user(request)
-    if status_:
-        status_2, resp_2 = ban_token(request)
-        if status_2:
-            response = render(
-                request, f"{templates_dir}/logout.html", {"require_login": True}
+        if user:
+            tokens = get_tokens_for_user(user)
+            response = JsonResponse({"message": "Login successful"})
+            response.set_cookie(
+                "access_token",
+                tokens["access"],
+                httponly=True,
+                samesite="Strict",
+                secure=True,
             )
-            response.delete_cookie("access_token")
-            response.delete_cookie("refresh_token")
+        
+            response.set_cookie(
+                "refresh_token",
+                tokens["refresh"],
+                httponly=True,
+                samesite="Strict",
+                secure=True,
+            )
+            response["HX-Redirect"] = "/"
             return response
         else:
-            return render(
-                request, f"{templates_dir}/index.html", {"require_login": True}
+            return Response(
+                {"ERROR": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
-    else:
-        return render(request, f"{templates_dir}/index.html", {"require_login": True})
+
+
+
+class Log_out_API(APIView):
+    def get(self, request):
+        status_, resp_ = auth_user(request)
+        if status_:
+            status_2, resp_2 = ban_token(request)
+            if status_2:
+                response = render(
+                    request, f"{templates_dir}/logout.html", {"require_login": True}
+                )
+                response.delete_cookie("access_token")
+                response.delete_cookie("refresh_token")
+                return response
+            else:
+                return render(
+                    request, f"{templates_dir}/index.html", {"require_login": True}
+                )
+        else:
+            return render(request, f"{templates_dir}/index.html", {"require_login": True})
