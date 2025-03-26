@@ -28,12 +28,6 @@ def index(request):
     if status_:
         return render(request, f"{templates_dir}/index.html")
     else:
-
-
-
-
-
-        
         return render(request, f"{templates_dir}/index.html", {"require_login": True})
 
 
