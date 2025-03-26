@@ -228,7 +228,7 @@ class Snapshot_browser_view(APIView):
 
 
 
-class Snapshot_API_export(request):
+class Snapshot_API_export(APIView):
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
