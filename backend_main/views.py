@@ -1,4 +1,3 @@
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -22,14 +21,15 @@ templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
 
-
 class index(APIView):
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
             return render(request, f"{templates_dir}/index.html")
         else:
-            return render(request, f"{templates_dir}/index.html", {"require_login": True})
+            return render(
+                request, f"{templates_dir}/index.html", {"require_login": True}
+            )
 
 
 class Process_browser_view(APIView):
@@ -58,7 +58,6 @@ class Process_browser_view(APIView):
 
         else:
             return redirect("/sign-in/")
-
 
 
 class Process_API_snap(APIView):
@@ -100,10 +99,10 @@ class Process_API_snap(APIView):
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         else:
-            return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
-
- 
 
 class Process_API_kill(APIView):
     def get(self, request):
@@ -149,7 +148,9 @@ class Process_API_kill(APIView):
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         else:
-            return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 class Snapshot_browser_view(APIView):
@@ -214,20 +215,6 @@ class Snapshot_browser_view(APIView):
             )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Snapshot_API_export(APIView):
     def get(self, request):
         status_, resp_ = auth_user(request)
@@ -243,7 +230,8 @@ class Snapshot_API_export(APIView):
                 status_, resp_ = create_excel(snap_id)
                 if status_ != True:
                     return Response(
-                        {"ERROR": f"{resp_}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        {"ERROR": f"{resp_}"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     )
 
                 return resp_
@@ -252,7 +240,9 @@ class Snapshot_API_export(APIView):
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         else:
-            return Response({"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 class Kill_Log_browser_view(APIView):
@@ -292,25 +282,24 @@ class Kill_Log_browser_view(APIView):
 # Auth methods
 
 
-
- 
-
-
-
 class Register_view(APIView):
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
             return render(request, f"{templates_dir}/index.html")
         else:
-            return render(request, f"{templates_dir}/sign-up.html", {"require_login": True})
+            return render(
+                request, f"{templates_dir}/sign-up.html", {"require_login": True}
+            )
 
 
 class Register_API(APIView):
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
-            return Response({"ERROR": "User logged in"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"ERROR": "User logged in"}, status=status.HTTP_403_FORBIDDEN
+            )
 
         try:
             serializer_ = UserSerializer(data=request.data)
@@ -322,11 +311,13 @@ class Register_API(APIView):
                 )
             else:
                 return Response(
-                    {"ERROR": f"{serializer_.errors}"}, status=status.HTTP_400_BAD_REQUEST
+                    {"ERROR": f"{serializer_.errors}"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception as e:
-            return Response({"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response(
+                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class Login_view(APIView):
@@ -335,8 +326,9 @@ class Login_view(APIView):
         if status_:
             return render(request, f"{templates_dir}/index.html")
         else:
-            return render(request, f"{templates_dir}/sign-in.html", {"require_login": True})
-
+            return render(
+                request, f"{templates_dir}/sign-in.html", {"require_login": True}
+            )
 
 
 class Login_API(APIView):
@@ -361,7 +353,7 @@ class Login_API(APIView):
                 samesite="Strict",
                 secure=True,
             )
-        
+
             response.set_cookie(
                 "refresh_token",
                 tokens["refresh"],
@@ -375,7 +367,6 @@ class Login_API(APIView):
             return Response(
                 {"ERROR": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
-
 
 
 class Log_out_API(APIView):
@@ -395,4 +386,6 @@ class Log_out_API(APIView):
                     request, f"{templates_dir}/index.html", {"require_login": True}
                 )
         else:
-            return render(request, f"{templates_dir}/index.html", {"require_login": True})
+            return render(
+                request, f"{templates_dir}/index.html", {"require_login": True}
+            )
