@@ -1,13 +1,15 @@
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
+
 from rest_framework.views import APIView
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import pathlib
-from models import ProcessObject, SnapshotObject, KillLog_object
-from .auth_utlis import ban_token, auth_user, get_tokens_for_user
+from .models import ProcessObject, SnapshotObject, KillLog_object
+from .auth_utils import ban_token, auth_user, get_tokens_for_user
 from .serializers import (
     UserSerializer,
     ProcessSerializer,
@@ -22,6 +24,7 @@ partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials
 
 
 class index(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -32,10 +35,9 @@ class index(APIView):
             )
 
 
+
 class Process_browser_view(APIView):
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
             try:
                 processes = get_process_info()
                 if request.headers.get("HX-Request") == "true":
@@ -55,17 +57,15 @@ class Process_browser_view(APIView):
                 return Response(
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-
-        else:
-            return redirect("/sign-in/")
+                
 
 
 class Process_API_snap(APIView):
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
+
             try:
-                user_id = resp_
+                user_id = request.user.id
+                
                 snapData = {"snapshot_author": user_id}
 
                 snap_serializer = SnapshotSerializer(data=snapData)
@@ -98,17 +98,15 @@ class Process_API_snap(APIView):
                 return Response(
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-        else:
-            return Response(
-                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
-            )
+
 
 
 class Process_API_kill(APIView):
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
+        
+        
             try:
+                user_id = request.user.id
                 pid = request.POST.get("pid")
                 proc_name = request.POST.get("proc_name")
                 if pid == None or proc_name == None:
@@ -117,7 +115,7 @@ class Process_API_kill(APIView):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     )
 
-                user_id = resp_
+                
 
                 killLogData = {
                     "KillLog_Author": user_id,
@@ -147,17 +145,13 @@ class Process_API_kill(APIView):
                 return Response(
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-        else:
-            return Response(
-                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
-            )
+
 
 
 class Snapshot_browser_view(APIView):
-    def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
+    def get(self, request):       
             try:
+                
                 snap_id = request.GET.get("snap_id")
 
                 if snap_id != None:
@@ -187,12 +181,10 @@ class Snapshot_browser_view(APIView):
                 return Response(
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-        else:
-            return redirect("/sign-in/")
+
 
     def delete(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
+
             snapshot_id = request.data.get("snapshot_id")
 
             if snapshot_id == None:
@@ -209,17 +201,15 @@ class Snapshot_browser_view(APIView):
             except Exception as e:
                 return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        else:
-            return Response(
-                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
-            )
+
 
 
 class Snapshot_API_export(APIView):
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
+        
+        
             try:
+                user_id = request.user.id
                 snap_id = request.GET.get("snap_id")
                 if snap_id == None:
                     return Response(
@@ -239,24 +229,17 @@ class Snapshot_API_export(APIView):
                 return Response(
                     {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-        else:
-            return Response(
-                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
-            )
 
 
 class Kill_Log_browser_view(APIView):
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
             kills = KillLog_object.objects.all()
             return render(request, f"{templates_dir}/kill-log.html", {"kills": kills})
-        else:
-            return redirect("/sign-in/")
+        
 
     def delete(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
+        
+        
             kill_id = request.data.get("kill_id")
             if kill_id == None:
                 return Response(
@@ -272,10 +255,6 @@ class Kill_Log_browser_view(APIView):
             except Exception as e:
                 return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        else:
-            return Response(
-                {"ERROR": "Auth error"}, status=status.HTTP_401_UNAUTHORIZED
-            )
 
 
 ###########################################################################
@@ -283,6 +262,7 @@ class Kill_Log_browser_view(APIView):
 
 
 class Register_view(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -294,7 +274,8 @@ class Register_view(APIView):
 
 
 class Register_API(APIView):
-    def get(self, request):
+    permission_classes = [AllowAny]
+    def post(self, request):
         status_, resp_ = auth_user(request)
         if status_:
             return Response(
@@ -321,6 +302,7 @@ class Register_API(APIView):
 
 
 class Login_view(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -332,7 +314,8 @@ class Login_view(APIView):
 
 
 class Login_API(APIView):
-    def get(self, request):
+    permission_classes = [AllowAny]
+    def post(self, request):
         status_, resp_ = auth_user(request)
         if status_:
             return Response(

@@ -48,14 +48,15 @@ INSTALLED_APPS = [
 ]
 
 
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        'backend_main.custom_auth_methods.Custom_jwt_cookie_auth',
     ),
     "DEFAULT_PERMISSION_CLASSES": [
-        # "rest_framework.permissions.IsAuthenticated",
-        #'rest_framework.permissions.AllowAny',  # Public access
+        "rest_framework.permissions.IsAuthenticated",  
     ],
+    'EXCEPTION_HANDLER': 'backend_main.auth_utils.custom_exception_handler',
 }
 
 SIMPLE_JWT = {
