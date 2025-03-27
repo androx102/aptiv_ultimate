@@ -28,8 +28,8 @@ class index(APIView):
     def get(self, request):
         auth_required = not request.user.is_authenticated
         return render(
-                request, f"{templates_dir}/index.html", {"auth_required": auth_required}
-            )
+            request, f"{templates_dir}/index.html", {"auth_required": auth_required}
+        )
 
 
 class Process_browser_view(APIView):
@@ -115,7 +115,6 @@ class Process_API_kill(APIView):
             kill_log_serializer = KillLogSerializer(data=killLogData)
 
             if kill_log_serializer.is_valid():
-                
                 status_, message_ = kill_proc_by_id(int(pid))
 
                 if status_:
@@ -133,7 +132,6 @@ class Process_API_kill(APIView):
                     f"{partials_dir}/proc_table.html",
                     {"processes": processes},
                 )
-
 
         except Exception as e:
             return Response(
@@ -184,14 +182,14 @@ class Snapshot_browser_view(APIView):
         try:
             snapshot = get_object_or_404(SnapshotObject, snapshot_id=snapshot_id)
             snapshot.delete()
-                       
+
             snapshots = SnapshotObject.objects.all()
             return render(
                 request,
                 f"{partials_dir}/snap_table.html",
                 {"snapshots": snapshots},
             )
-            
+
         except Exception as e:
             return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -264,7 +262,7 @@ class Register_API(APIView):
 
     def post(self, request):
         if request.user.is_authenticated:
-            return redirect("/")              
+            return redirect("/")
 
         try:
             serializer_ = UserSerializer(data=request.data)
@@ -290,7 +288,7 @@ class Login_view(APIView):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect("/")      
+            return redirect("/")
         else:
             return render(
                 request, f"{templates_dir}/sign-in.html", {"auth_required": True}
@@ -302,7 +300,7 @@ class Login_API(APIView):
 
     def post(self, request):
         if request.user.is_authenticated:
-            return redirect("/")      
+            return redirect("/")
 
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -337,16 +335,15 @@ class Login_API(APIView):
 class Log_out_API(APIView):
     def get(self, request):
         if not request.user.is_authenticated:
-            return redirect("/")      
-        
-        status_, resp_ = ban_token(request)
-        if status_:
-                response = render(
-                    request, f"{templates_dir}/logout.html", {"require_login": True}
-                )
-                response.delete_cookie("access_token")
-                response.delete_cookie("refresh_token")
-                return response
-        else:
             return redirect("/")
 
+        status_, resp_ = ban_token(request)
+        if status_:
+            response = render(
+                request, f"{templates_dir}/logout.html", {"require_login": True}
+            )
+            response.delete_cookie("access_token")
+            response.delete_cookie("refresh_token")
+            return response
+        else:
+            return redirect("/")

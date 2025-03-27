@@ -1,6 +1,4 @@
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework_simplejwt.exceptions import TokenError
-import jwt
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from rest_framework.exceptions import AuthenticationFailed
@@ -16,7 +14,6 @@ templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend
 
 
 def custom_exception_handler(exc, context):
-
     if isinstance(exc, (AuthenticationFailed, NotAuthenticated, PermissionDenied)):
         return redirect("/sign-in/")
 
@@ -32,7 +29,6 @@ def get_tokens_for_user(user):
         "refresh": str(refresh),
         "access": str(refresh.access_token),
     }
-
 
 
 def ban_token(request):
