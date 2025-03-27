@@ -1,10 +1,6 @@
 from rest_framework_simplejwt.tokens import RefreshToken
-
-
 from rest_framework.exceptions import AuthenticationFailed
-
 from rest_framework.response import Response
-
 from rest_framework.views import exception_handler
 from django.shortcuts import redirect
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
