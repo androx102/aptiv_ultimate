@@ -12,7 +12,7 @@
       <div class="hidden w-full md:block md:w-auto" id="navbar-default">
         <ul class="font-medium flex flex-col p-4 md:p-0 my-1 md:my-2 rounded-lg md:flex-row md:space-x-8">
         
-        {% if require_login == True %}
+        {% if auth_required == True %}
         <li>
             <a href="{% url 'sign_in' %}" 
                 class="block py-2 pl-3 pr-4 text-white rounded md:p-0" 

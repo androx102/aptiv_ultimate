@@ -14,7 +14,7 @@
         </a>
         </button>         
     </td>
-    <td><button class="btn btn-sm" hx-delete="{% url 'snapshots' %}" hx-swap="none"
+    <td><button class="btn btn-sm" hx-delete="{% url 'snapshots' %}" hx-target="#snap-table-body"
         hx-vals='{"snapshot_id": "{{snap.snapshot_id}}" }'>
         Remove
     </button>

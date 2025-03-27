@@ -1,14 +1,14 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-
+from django.shortcuts import redirect
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import pathlib
 from .models import ProcessObject, SnapshotObject, KillLog_object
-from .auth_utils import ban_token, auth_user, get_tokens_for_user
+from .auth_utils import ban_token, get_tokens_for_user
 from .serializers import (
     UserSerializer,
     ProcessSerializer,
@@ -26,12 +26,9 @@ class index(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
-            return render(request, f"{templates_dir}/index.html")
-        else:
-            return render(
-                request, f"{templates_dir}/index.html", {"require_login": True}
+        auth_required = not request.user.is_authenticated
+        return render(
+                request, f"{templates_dir}/index.html", {"auth_required": auth_required}
             )
 
 
@@ -98,7 +95,7 @@ class Process_API_snap(APIView):
 
 
 class Process_API_kill(APIView):
-    def get(self, request):
+    def post(self, request):
         try:
             user_id = request.user.id
             pid = request.POST.get("pid")
@@ -118,7 +115,8 @@ class Process_API_kill(APIView):
             kill_log_serializer = KillLogSerializer(data=killLogData)
 
             if kill_log_serializer.is_valid():
-                status_, message_ = kill_proc_by_id(pid)
+                
+                status_, message_ = kill_proc_by_id(int(pid))
 
                 if status_:
                     kill_log = kill_log_serializer.save()
@@ -128,10 +126,14 @@ class Process_API_kill(APIView):
             else:
                 raise Exception(kill_log_serializer.errors)
 
-            return Response(
-                {"Message": f"Killed process with PID: {pid}, Name: {proc_name}"},
-                status=status.HTTP_200_OK,
-            )
+            processes = get_process_info()
+            if request.headers.get("HX-Request") == "true":
+                return render(
+                    request,
+                    f"{partials_dir}/proc_table.html",
+                    {"processes": processes},
+                )
+
 
         except Exception as e:
             return Response(
@@ -182,8 +184,14 @@ class Snapshot_browser_view(APIView):
         try:
             snapshot = get_object_or_404(SnapshotObject, snapshot_id=snapshot_id)
             snapshot.delete()
-            return Response({"OK": "Snapshot removed"}, status=status.HTTP_200_OK)
-
+                       
+            snapshots = SnapshotObject.objects.all()
+            return render(
+                request,
+                f"{partials_dir}/snap_table.html",
+                {"snapshots": snapshots},
+            )
+            
         except Exception as e:
             return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -243,12 +251,11 @@ class Register_view(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
-            return render(request, f"{templates_dir}/index.html")
+        if request.user.is_authenticated:
+            return redirect("/")
         else:
             return render(
-                request, f"{templates_dir}/sign-up.html", {"require_login": True}
+                request, f"{templates_dir}/sign-up.html", {"auth_required": True}
             )
 
 
@@ -256,11 +263,8 @@ class Register_API(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
-            return Response(
-                {"ERROR": "User logged in"}, status=status.HTTP_403_FORBIDDEN
-            )
+        if request.user.is_authenticated:
+            return redirect("/")              
 
         try:
             serializer_ = UserSerializer(data=request.data)
@@ -285,12 +289,11 @@ class Login_view(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
-            return render(request, f"{templates_dir}/index.html")
+        if request.user.is_authenticated:
+            return redirect("/")      
         else:
             return render(
-                request, f"{templates_dir}/sign-in.html", {"require_login": True}
+                request, f"{templates_dir}/sign-in.html", {"auth_required": True}
             )
 
 
@@ -298,11 +301,8 @@ class Login_API(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        status_, resp_ = auth_user(request)
-        if status_:
-            return Response(
-                {"ERROR": "User already logged in"}, status=status.HTTP_403_FORBIDDEN
-            )
+        if request.user.is_authenticated:
+            return redirect("/")      
 
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -336,21 +336,17 @@ class Login_API(APIView):
 
 class Log_out_API(APIView):
     def get(self, request):
-        status_, resp_ = auth_user(request)
+        if not request.user.is_authenticated:
+            return redirect("/")      
+        
+        status_, resp_ = ban_token(request)
         if status_:
-            status_2, resp_2 = ban_token(request)
-            if status_2:
                 response = render(
                     request, f"{templates_dir}/logout.html", {"require_login": True}
                 )
                 response.delete_cookie("access_token")
                 response.delete_cookie("refresh_token")
                 return response
-            else:
-                return render(
-                    request, f"{templates_dir}/index.html", {"require_login": True}
-                )
         else:
-            return render(
-                request, f"{templates_dir}/index.html", {"require_login": True}
-            )
+            return redirect("/")
+

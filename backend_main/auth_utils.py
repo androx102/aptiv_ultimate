@@ -16,7 +16,6 @@ templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend
 
 
 def custom_exception_handler(exc, context):
-    request = context.get("request")
 
     if isinstance(exc, (AuthenticationFailed, NotAuthenticated, PermissionDenied)):
         return redirect("/sign-in/")
@@ -34,31 +33,6 @@ def get_tokens_for_user(user):
         "access": str(refresh.access_token),
     }
 
-
-def auth_user(request):
-    # Get acess token from cookies
-    token = request.COOKIES.get("access_token")
-
-    if not token:
-        return False, "No token provided"
-
-    try:
-        decoded_token = AccessToken(token)
-
-        # TODO: check if token blacklisted!
-        # RefreshToken(token).check_blacklist()
-
-        return True, decoded_token["user_id"]
-
-    except Exception as e:
-        if isinstance(e, jwt.ExpiredSignatureError):
-            return False, "Token expired"
-        elif isinstance(e, jwt.InvalidTokenError):
-            return False, "Invalid token"
-        elif TokenError:
-            return False, "Token blacklisted"
-        else:
-            return False, "Authentication failed"
 
 
 def ban_token(request):
