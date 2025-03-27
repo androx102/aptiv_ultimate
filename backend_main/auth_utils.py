@@ -3,40 +3,28 @@ from rest_framework_simplejwt.exceptions import TokenError
 import jwt
 
 
-
-
 from rest_framework.exceptions import AuthenticationFailed
 
 from rest_framework.response import Response
 
 from rest_framework.views import exception_handler
 from django.shortcuts import redirect
-from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 import pathlib
+
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
 
 
-
-
-
-
-
-
-
 def custom_exception_handler(exc, context):
-    request = context.get('request')
+    request = context.get("request")
 
-    if isinstance(exc, (AuthenticationFailed, NotAuthenticated,PermissionDenied)):
+    if isinstance(exc, (AuthenticationFailed, NotAuthenticated, PermissionDenied)):
         return redirect("/sign-in/")
-      
-
 
     response = exception_handler(exc, context)
     if response is None:
         return Response({"error": "An unexpected error occurred"}, status=500)
     return response
-
-
 
 
 def get_tokens_for_user(user):

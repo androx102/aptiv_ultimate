@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from rest_framework.views import APIView
-from django.shortcuts import redirect
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -25,6 +24,7 @@ partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials
 
 class index(APIView):
     permission_classes = [AllowAny]
+
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -35,226 +35,204 @@ class index(APIView):
             )
 
 
-
 class Process_browser_view(APIView):
     def get(self, request):
-            try:
-                processes = get_process_info()
-                if request.headers.get("HX-Request") == "true":
-                    return render(
-                        request,
-                        f"{partials_dir}/proc_table.html",
-                        {"processes": processes},
-                    )
-                else:
-                    return render(
-                        request,
-                        f"{templates_dir}/proc-browser.html",
-                        {"processes": processes},
-                    )
-
-            except Exception as e:
-                return Response(
-                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        try:
+            processes = get_process_info()
+            if request.headers.get("HX-Request") == "true":
+                return render(
+                    request,
+                    f"{partials_dir}/proc_table.html",
+                    {"processes": processes},
                 )
-                
+            else:
+                return render(
+                    request,
+                    f"{templates_dir}/proc-browser.html",
+                    {"processes": processes},
+                )
+
+        except Exception as e:
+            return Response(
+                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class Process_API_snap(APIView):
     def get(self, request):
+        try:
+            user_id = request.user.id
 
-            try:
-                user_id = request.user.id
-                
-                snapData = {"snapshot_author": user_id}
+            snapData = {"snapshot_author": user_id}
 
-                snap_serializer = SnapshotSerializer(data=snapData)
+            snap_serializer = SnapshotSerializer(data=snapData)
 
-                if snap_serializer.is_valid():
-                    snap = snap_serializer.save()
-                else:
-                    print(snap_serializer.errors)
+            if snap_serializer.is_valid():
+                snap = snap_serializer.save()
+            else:
+                print(snap_serializer.errors)
 
-                processes = get_process_info()
+            processes = get_process_info()
 
-                for proces in processes:
-                    proces["snapshot"] = snap.snapshot_id
+            for proces in processes:
+                proces["snapshot"] = snap.snapshot_id
 
-                serializer = ProcessSerializer(data=processes, many=True)
+            serializer = ProcessSerializer(data=processes, many=True)
 
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(
-                        {"Message": "Snapshot created sucesfully"},
-                        status=status.HTTP_200_OK,
-                    )
-                else:
-                    return Response(
-                        {"ERROR": "Issue with snapshot serializer"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-            except Exception as e:
+            if serializer.is_valid():
+                serializer.save()
                 return Response(
-                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    {"Message": "Snapshot created sucesfully"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"ERROR": "Issue with snapshot serializer"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
+        except Exception as e:
+            return Response(
+                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class Process_API_kill(APIView):
     def get(self, request):
-        
-        
-            try:
-                user_id = request.user.id
-                pid = request.POST.get("pid")
-                proc_name = request.POST.get("proc_name")
-                if pid == None or proc_name == None:
-                    return Response(
-                        {"ERROR": "Must provide PID"},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    )
+        try:
+            user_id = request.user.id
+            pid = request.POST.get("pid")
+            proc_name = request.POST.get("proc_name")
+            if pid == None or proc_name == None:
+                return Response(
+                    {"ERROR": "Must provide PID"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
 
-                
+            killLogData = {
+                "KillLog_Author": user_id,
+                "KillLog_Process_Name": proc_name,
+                "KillLog_Process_Id": pid,
+            }
 
-                killLogData = {
-                    "KillLog_Author": user_id,
-                    "KillLog_Process_Name": proc_name,
-                    "KillLog_Process_Id": pid,
-                }
+            kill_log_serializer = KillLogSerializer(data=killLogData)
 
-                kill_log_serializer = KillLogSerializer(data=killLogData)
+            if kill_log_serializer.is_valid():
+                status_, message_ = kill_proc_by_id(pid)
 
-                if kill_log_serializer.is_valid():
-                    status_, message_ = kill_proc_by_id(pid)
-
-                    if status_:
-                        kill_log = kill_log_serializer.save()
-                    else:
-                        raise Exception(message_)
-
+                if status_:
+                    kill_log = kill_log_serializer.save()
                 else:
-                    raise Exception(kill_log_serializer.errors)
+                    raise Exception(message_)
 
-                return Response(
-                    {"Message": f"Killed process with PID: {pid}, Name: {proc_name}"},
-                    status=status.HTTP_200_OK,
-                )
+            else:
+                raise Exception(kill_log_serializer.errors)
 
-            except Exception as e:
-                return Response(
-                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            return Response(
+                {"Message": f"Killed process with PID: {pid}, Name: {proc_name}"},
+                status=status.HTTP_200_OK,
+            )
 
+        except Exception as e:
+            return Response(
+                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class Snapshot_browser_view(APIView):
-    def get(self, request):       
-            try:
-                
-                snap_id = request.GET.get("snap_id")
+    def get(self, request):
+        try:
+            snap_id = request.GET.get("snap_id")
 
-                if snap_id != None:
-                    try:
-                        snapshot = SnapshotObject.objects.get(snapshot_id=snap_id)
-                        processes = ProcessObject.objects.filter(snapshot=snapshot)
-                        return render(
-                            request,
-                            f"{templates_dir}/snap_details.html",
-                            {"snapshot": snapshot, "processes": processes},
-                        )
-
-                    except Exception as e:
-                        return render(
-                            request, f"{templates_dir}/404.html", {"errors": e}
-                        )
-
-                else:
-                    snapshots = SnapshotObject.objects.all()
+            if snap_id != None:
+                try:
+                    snapshot = SnapshotObject.objects.get(snapshot_id=snap_id)
+                    processes = ProcessObject.objects.filter(snapshot=snapshot)
                     return render(
                         request,
-                        f"{templates_dir}/snapshots.html",
-                        {"snapshots": snapshots},
+                        f"{templates_dir}/snap_details.html",
+                        {"snapshot": snapshot, "processes": processes},
                     )
 
-            except Exception as e:
-                return Response(
-                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                except Exception as e:
+                    return render(request, f"{templates_dir}/404.html", {"errors": e})
+
+            else:
+                snapshots = SnapshotObject.objects.all()
+                return render(
+                    request,
+                    f"{templates_dir}/snapshots.html",
+                    {"snapshots": snapshots},
                 )
 
+        except Exception as e:
+            return Response(
+                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def delete(self, request):
+        snapshot_id = request.data.get("snapshot_id")
 
-            snapshot_id = request.data.get("snapshot_id")
+        if snapshot_id == None:
+            return Response(
+                {"ERROR": "Snapshot ID not provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-            if snapshot_id == None:
+        try:
+            snapshot = get_object_or_404(SnapshotObject, snapshot_id=snapshot_id)
+            snapshot.delete()
+            return Response({"OK": "Snapshot removed"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Snapshot_API_export(APIView):
+    def get(self, request):
+        try:
+            user_id = request.user.id
+            snap_id = request.GET.get("snap_id")
+            if snap_id == None:
                 return Response(
                     {"ERROR": "Snapshot ID not provided"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            try:
-                snapshot = get_object_or_404(SnapshotObject, snapshot_id=snapshot_id)
-                snapshot.delete()
-                return Response({"OK": "Snapshot removed"}, status=status.HTTP_200_OK)
-
-            except Exception as e:
-                return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-class Snapshot_API_export(APIView):
-    def get(self, request):
-        
-        
-            try:
-                user_id = request.user.id
-                snap_id = request.GET.get("snap_id")
-                if snap_id == None:
-                    return Response(
-                        {"ERROR": "Snapshot ID not provided"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-                status_, resp_ = create_excel(snap_id)
-                if status_ != True:
-                    return Response(
-                        {"ERROR": f"{resp_}"},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    )
-
-                return resp_
-            except Exception as e:
+            status_, resp_ = create_excel(snap_id)
+            if status_ != True:
                 return Response(
-                    {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    {"ERROR": f"{resp_}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+
+            return resp_
+        except Exception as e:
+            return Response(
+                {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class Kill_Log_browser_view(APIView):
     def get(self, request):
-            kills = KillLog_object.objects.all()
-            return render(request, f"{templates_dir}/kill-log.html", {"kills": kills})
-        
+        kills = KillLog_object.objects.all()
+        return render(request, f"{templates_dir}/kill-log.html", {"kills": kills})
 
     def delete(self, request):
-        
-        
-            kill_id = request.data.get("kill_id")
-            if kill_id == None:
-                return Response(
-                    {"ERROR": "Kill entry ID not provided"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+        kill_id = request.data.get("kill_id")
+        if kill_id == None:
+            return Response(
+                {"ERROR": "Kill entry ID not provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-            try:
-                kill_entry = get_object_or_404(KillLog_object, KillLog_ID=kill_id)
-                kill_entry.delete()
-                return Response({"OK": "Kill entry removed"}, status=status.HTTP_200_OK)
+        try:
+            kill_entry = get_object_or_404(KillLog_object, KillLog_ID=kill_id)
+            kill_entry.delete()
+            return Response({"OK": "Kill entry removed"}, status=status.HTTP_200_OK)
 
-            except Exception as e:
-                return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
-
+        except Exception as e:
+            return Response({"ERROR": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 ###########################################################################
@@ -263,6 +241,7 @@ class Kill_Log_browser_view(APIView):
 
 class Register_view(APIView):
     permission_classes = [AllowAny]
+
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -275,6 +254,7 @@ class Register_view(APIView):
 
 class Register_API(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -303,6 +283,7 @@ class Register_API(APIView):
 
 class Login_view(APIView):
     permission_classes = [AllowAny]
+
     def get(self, request):
         status_, resp_ = auth_user(request)
         if status_:
@@ -315,6 +296,7 @@ class Login_view(APIView):
 
 class Login_API(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         status_, resp_ = auth_user(request)
         if status_:
