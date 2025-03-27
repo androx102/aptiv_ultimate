@@ -67,26 +67,23 @@ class Process_API_snap(APIView):
             if snap_serializer.is_valid():
                 snap = snap_serializer.save()
             else:
-                print(snap_serializer.errors)
+                raise Exception(snap_serializer.errors)
 
             processes = get_process_info()
 
             for proces in processes:
                 proces["snapshot"] = snap.snapshot_id
 
-            serializer = ProcessSerializer(data=processes, many=True)
+            proc_serializer = ProcessSerializer(data=processes, many=True)
 
-            if serializer.is_valid():
-                serializer.save()
+            if proc_serializer.is_valid():
+                proc_serializer.save()
                 return Response(
                     {"Message": "Snapshot created sucesfully"},
                     status=status.HTTP_200_OK,
                 )
             else:
-                return Response(
-                    {"ERROR": "Issue with snapshot serializer"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                raise Exception(proc_serializer.errors)
 
         except Exception as e:
             return Response(
@@ -197,7 +194,6 @@ class Snapshot_browser_view(APIView):
 class Snapshot_API_export(APIView):
     def get(self, request):
         try:
-            user_id = request.user.id
             snap_id = request.GET.get("snap_id")
             if snap_id == None:
                 return Response(
@@ -265,18 +261,16 @@ class Register_API(APIView):
             return redirect("/")
 
         try:
-            serializer_ = UserSerializer(data=request.data)
+            usr_erializer = UserSerializer(data=request.data)
 
-            if serializer_.is_valid():
-                serializer_.save()
+            if usr_erializer.is_valid():
+                usr_erializer.save()
                 return Response(
                     {"OK": "User created sucesfully"}, status=status.HTTP_201_CREATED
                 )
             else:
-                return Response(
-                    {"ERROR": f"{serializer_.errors}"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                raise Exception(usr_erializer.errors)
+            
         except Exception as e:
             return Response(
                 {"ERROR": f"{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
