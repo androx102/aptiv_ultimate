@@ -270,8 +270,7 @@ class Register_API(APIView):
                 )
             else:
                 return Response(
-                    usr_serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST
+                    usr_serializer.errors, status=status.HTTP_400_BAD_REQUEST
                 )
 
         except Exception as e:
