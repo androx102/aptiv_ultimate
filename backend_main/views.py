@@ -261,15 +261,18 @@ class Register_API(APIView):
             return redirect("/")
 
         try:
-            usr_erializer = UserSerializer(data=request.data)
+            usr_serializer = UserSerializer(data=request.data)
 
-            if usr_erializer.is_valid():
-                usr_erializer.save()
+            if usr_serializer.is_valid():
+                usr_serializer.save()
                 return Response(
                     {"OK": "User created sucesfully"}, status=status.HTTP_201_CREATED
                 )
             else:
-                raise Exception(usr_erializer.errors)
+                return Response(
+                    usr_serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         except Exception as e:
             return Response(
