@@ -8,6 +8,7 @@ import pathlib
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
+
 ########## Auth ##########
 class LoginViewTest(TestCase):
     @classmethod
@@ -175,6 +176,7 @@ class RegisterAPITest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("email", response.json())
 
+
 ########## Process browser ##########
 class ProcessBrowserViewTest(TestCase):
     @classmethod
@@ -203,8 +205,8 @@ class ProcessBrowserViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.proc_browser_template)
-    
-    #To fix
+
+    # To fix
     def test_partial_render_table(self):
         pass
 
@@ -235,17 +237,14 @@ class ProcessBrowserKillAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-
-    #TO FIX
+    # TO FIX
     def test_kill_process_sucess(self):
-        #TODO: test killing process with sucess
+        # TODO: test killing process with sucess
         pass
-    
+
     def test_kill_process_fail(self):
-        #TODO: test killing process failed due to worng PID
+        # TODO: test killing process failed due to worng PID
         pass
-
-
 
 
 class ProcessBrowserSnapAPITest(TestCase):
@@ -272,13 +271,13 @@ class ProcessBrowserSnapAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-    #To fix
+    # To fix
     def test_take_snapshot_sucess(self):
-        #TODO: create snapshot with sucess 
+        # TODO: create snapshot with sucess
         pass
-    
+
     def test_take_snapshot_fail(self):
-        #TODO: create snapshot fail 
+        # TODO: create snapshot fail
         pass
 
 
@@ -337,39 +336,34 @@ class SnapshotBrowserViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.snap_details_template)
 
-
-
-    #To veirfy
+    # To veirfy
     def test_details_wrong_id(self):
         self.client.cookies["access_token"] = self.token
-        response = self.client.get(
-            f"{self.snapshots_url}?snap_id={2137}"
-        )
+        response = self.client.get(f"{self.snapshots_url}?snap_id={2137}")
         self.assertEqual(response.status_code, 400)
-        
 
     # Need to fix this !!!
     def test_deleted_snapshot_sucess(self):
         pass
-        #self.client.cookies["access_token"] = self.token
-        #valid_data = {
+        # self.client.cookies["access_token"] = self.token
+        # valid_data = {
         #    "snapshot_id": int(self.test_snap_object.snapshot_id),
-        #}
-        #response = self.client.delete(self.snapshots_url, valid_data)
-        
-        #self.assertEqual(response.status_code, 200)
-        #self.assertFalse(
+        # }
+        # response = self.client.delete(self.snapshots_url, valid_data)
+
+        # self.assertEqual(response.status_code, 200)
+        # self.assertFalse(
         #    SnapshotObject.objects.filter(
         #        snapshot_id=self.test_snap_object.snapshot_id
         #    ).exists()
-        #)
+        # )
         # self.assertTemplateUsed(response, self.snap_details_template)
-        
+
     def test_deleted_snapshot_fail(self):
         pass
 
 
-################ DRAFTS ################ 
+################ DRAFTS ################
 class SnapshotExportAPITest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -379,7 +373,6 @@ class SnapshotExportAPITest(TestCase):
         cls.token = str(AccessToken.for_user(cls.user))
         cls.snapshots_export_url = reverse("export_snap")
         cls.sing_in_url = reverse("sign_in")
-        
 
     def setUp(self):
         self.client = Client()
@@ -394,26 +387,26 @@ class SnapshotExportAPITest(TestCase):
         )
 
     def test_acess_denied(self):
-        valid_data = {"snap_id":self.test_snap_object.snapshot_id}
-        response = self.client.get(snapshots_export_url,valid_data)
+        valid_data = {"snap_id": self.test_snap_object.snapshot_id}
+        response = self.client.get(snapshots_export_url, valid_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-
-    #To fix
+    # To fix
     def test_export_snapshot_sucess(self):
         self.client.cookies["access_token"] = self.token
-        valid_data = {"snap_id":self.test_snap_object.snapshot_id}
+        valid_data = {"snap_id": self.test_snap_object.snapshot_id}
 
-        response = self.client.get(snapshots_export_url,valid_data)
+        response = self.client.get(snapshots_export_url, valid_data)
 
         self.assertEqual(response.status_code, 200)
-        #TODO: 
+        # TODO:
         # - check file
         # - add test processes
-       # self.assertTemplateUsed(response, self.snap_details_template)
 
-    #To fix
+    # self.assertTemplateUsed(response, self.snap_details_template)
+
+    # To fix
     def test_export_snapshot_fail(self):
         pass
 
@@ -447,14 +440,13 @@ class KillLogBrowserViewTest(TestCase):
         self.assertRedirects(response, self.sing_in_url)
 
     def test_has_access(self):
-        self.client.cookies["access_token"] = self.token        
+        self.client.cookies["access_token"] = self.token
         response = self.client.get(kill_log_url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.kill_log_template)
-    
 
-    #To fix
+    # To fix
     def test_remove_kill_log_entry_sucess(self):
         pass
 
