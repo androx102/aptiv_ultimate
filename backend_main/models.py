@@ -39,7 +39,7 @@ class ProcessObject(models.Model):
     process_status = models.CharField(max_length=254)
     process_start_time = models.DateTimeField()
     process_duration = models.DurationField()
-    process_name = models.CharField(max_length=255)
+    process_name = models.CharField(max_length=255, blank=True)
     process_memory_usage = models.FloatField()
     process_cpu_usage = models.FloatField(help_text="CPU usage percentage")
 
