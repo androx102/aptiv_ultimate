@@ -74,7 +74,6 @@ class LoginAPITest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("access_token", response.cookies)
         self.assertEqual(response.cookies["access_token"].value != "", True)
-        
 
     def test_logging_in_fail(self):
         """Invalid credentials should return a 401 Unauthorized status."""
