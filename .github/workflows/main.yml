@@ -38,7 +38,7 @@ jobs:
         with:
           commit_message: 'style fixes by ruff'
   test:
-    name: Lint and Fix 
+    name: Django test 
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
