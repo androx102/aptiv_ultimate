@@ -120,7 +120,11 @@ class Snapshot_browser_view(APIView):
 
         if snap_id != None:
             snapshot = get_object_or_404(SnapshotObject, snapshot_id=snap_id)
-            processes = get_list_or_404(ProcessObject, snapshot=snapshot)
+            
+            
+            processes = ProcessObject.objects.filter(snapshot=snapshot)
+            
+            
             return render(
                 request,
                 f"{templates_dir}/snap_details.html",
