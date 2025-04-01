@@ -10,7 +10,7 @@ from .models import *
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
-SKIP_OLD_TESTS = True
+SKIP_OLD_TESTS = False
 
 
 ########## Auth ##########
