@@ -338,8 +338,8 @@ class SnapshotBrowserViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.snapshots_template)
 
-    #@unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    #def test_details_acess_denied(self):
+    # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    # def test_details_acess_denied(self):
     #    """If user is not logged in, they should  be redirected to the the login page."""
     #    response = self.client.get(
     #        f"{self.snapshots_url}?snap_id={self.test_snap_object.snapshot_id}"
@@ -361,7 +361,7 @@ class SnapshotBrowserViewTest(TestCase):
     def test_get_details_wrong_id_fail(self):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(
-            f"{self.snapshots_url}?snap_id={"1dd4f9b0-5a36-490d-a327-4f9d002bd18b"}"
+            f"{self.snapshots_url}?snap_id={'1dd4f9b0-5a36-490d-a327-4f9d002bd18b'}"
         )
         self.assertEqual(response.status_code, 400)
 
@@ -491,7 +491,6 @@ class KillLogBrowserViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_remove_kill_log_entry_fail(self):
         """If kill_id is not valid -> return 400"""
@@ -499,6 +498,11 @@ class KillLogBrowserViewTest(TestCase):
         not_valid_data = {
             "kill_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b",
         }
-        response = self.client.delete(self.kill_log_url, not_valid_data, format="json",content_type='application/json')
+        response = self.client.delete(
+            self.kill_log_url,
+            not_valid_data,
+            format="json",
+            content_type="application/json",
+        )
 
         self.assertEqual(response.status_code, 400)
