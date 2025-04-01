@@ -257,17 +257,19 @@ class ProcessBrowserKillAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-    # TO FIX
+    @override_settings(DUMMY_PROCESS_DATA=True)
     def test_kill_process_sucess(self):
-        # TODO: test killing process with sucess
-        pass
-
-    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_kill_process_invalid_pid_fail(self):
         self.client.cookies["access_token"] = self.token
         self.valid_data["pid"] = "2137"
         response = self.client.post(self.kill_proc_api, self.valid_data)
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(DUMMY_PROCESS_DATA=True)
+    def test_kill_process_invalid_pid_fail(self):
+        self.client.cookies["access_token"] = self.token
+        self.valid_data["pid"] = "420"
+        response = self.client.post(self.kill_proc_api, self.valid_data)
+        self.assertEqual(response.status_code, 400)
 
 
 ####################################################################################

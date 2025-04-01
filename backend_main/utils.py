@@ -58,6 +58,13 @@ def get_process_info():
 
 
 def kill_proc_by_id(pid):
+    if settings.DUMMY_PROCESS_DATA:
+        if pid == 2137:
+            return True, "Proc killed sucesfully"
+        else:
+            return False, f"Proc with PID: {pid} is not existing"
+
+
     try:
         # Get proc to kill by PID
         proc_to_kill = psutil.Process(pid)

@@ -113,7 +113,7 @@ class Process_API_kill(APIView):
             else:
                 return Response(
                     {"ERROR": f"Could not kill process due: {message_}"},
-                    status=status.HTTP_500_BAD_REQUEST,
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
         else:
             return Response(
