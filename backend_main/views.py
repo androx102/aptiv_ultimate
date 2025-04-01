@@ -121,13 +121,6 @@ class Process_API_kill(APIView):
                 kill_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-        #############################################
-        if settings.DUMMY_PROCESS_DATA:
-            return Response(
-                {"OK": "testing ok"},
-                status=status.HTTP_201_CREATED,
-            )
-        #############################################
 
         processes = get_process_info()
 
@@ -135,6 +128,12 @@ class Process_API_kill(APIView):
             return render(
                 request,
                 f"{partials_dir}/proc_table.html",
+                {"processes": processes},
+            )
+        else:
+            return render(
+                request,
+                f"{templates_dir}/proc-browser.html",
                 {"processes": processes},
             )
 
