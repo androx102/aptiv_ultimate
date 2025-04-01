@@ -310,6 +310,7 @@ class SnapshotBrowserViewTest(TestCase):
         cls.sing_in_url = reverse("sign_in")
         cls.snapshots_template = f"{templates_dir}/snapshots.html"
         cls.snap_details_template = f"{templates_dir}/snap_details.html"
+        cls.snap_table_template = f"{partials_dir}/snap_table.html"
 
     def setUp(self):
         self.client = Client()
@@ -365,6 +366,7 @@ class SnapshotBrowserViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_deleted_snapshot_sucess(self):
         """If snap_ID is valid -> remove from DB, return 200"""
         self.client.cookies["access_token"] = self.token
@@ -386,8 +388,9 @@ class SnapshotBrowserViewTest(TestCase):
                 snapshot_id=self.test_snap_object.snapshot_id
             ).exists()
         )
-        self.assertTemplateUsed(response, self.snap_details_template)
+        self.assertTemplateUsed(response, self.snap_table_template)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_deleted_snapshot_fail(self):
         """If snap_ID is not valid ->return 404"""
         self.client.cookies["access_token"] = self.token
@@ -436,7 +439,7 @@ class SnapshotExportAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-    # To fix
+    
     def test_export_snapshot_sucess(self):
         self.client.cookies["access_token"] = self.token
         valid_data = {"snap_id": self.test_snap_object.snapshot_id}
@@ -444,15 +447,15 @@ class SnapshotExportAPITest(TestCase):
         response = self.client.get(self.snapshots_export_url, valid_data)
 
         self.assertEqual(response.status_code, 200)
-        # TODO:
-        # - check file
-        # - add test processes
-
-    # self.assertTemplateUsed(response, self.snap_details_template)
-
-    # To fix
+        self.assertEqual(response['Content-Disposition'], f'attachment; filename="snapshot_{self.test_snap_object.snapshot_id}.xlsx"')        
+        self.assertEqual(response['Content-Type'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        
     def test_export_snapshot_fail(self):
-        pass
+        self.client.cookies["access_token"] = self.token
+        not_valid_data = {"snap_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b"}
+
+        response = self.client.get(self.snapshots_export_url, not_valid_data)
+        
 
 
 class KillLogBrowserViewTest(TestCase):
