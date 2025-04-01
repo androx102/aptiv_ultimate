@@ -176,8 +176,8 @@ class RegisterAPITest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_up_invalid_data_fail(self):
         """Test that invalid data returns a 400 Bad Request status code."""
-        
-        self.valid_user_data['email'] = "invalid-email"
+
+        self.valid_user_data["email"] = "invalid-email"
 
         response = self.client.post(self.sign_up_api_url, self.valid_user_data)
 
@@ -188,8 +188,6 @@ class RegisterAPITest(TestCase):
     def test_username_or_email_already_taken_fail(self):
         response = self.client.post(self.sign_up_api_url, self.existing_user_data)
         self.assertEqual(response.status_code, 400)
-        
-        
 
 
 ########## Process browser ##########

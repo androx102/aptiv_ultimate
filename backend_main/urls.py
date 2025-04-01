@@ -43,23 +43,23 @@ urlpatterns = [
     # Tested: 6/6
     # 2. Export to excel -> return file
     path("API/snap/excel/", Snapshot_API_export.as_view(), name="export_snap"),
-    # Tested: 3/3  
+    # Tested: 3/3
     ########## Kill log interface ##########
     # 1. Display page -> return htmx
     path("kill-log/", Kill_Log_browser_view.as_view(), name="kill-log"),
     # Tested: 4/4
     ########## Auth ##########
     # 1. Sign-in page -> return htmx
-    path("sign-in/", Login_view.as_view(), name="sign_in"),  
+    path("sign-in/", Login_view.as_view(), name="sign_in"),
     # Tested: 2/2
     # 2. Sign-in endpoint -> retunr json
-    path("API/sign-in/", Login_API.as_view(), name="sign_in_api"),  
+    path("API/sign-in/", Login_API.as_view(), name="sign_in_api"),
     # Tested: 3/3
     # 3. Sign-up page -> -> return htmx
-    path("sign-up/", Register_view.as_view(), name="sign_up"),  
+    path("sign-up/", Register_view.as_view(), name="sign_up"),
     # Tested: 2/2
     # 4. Sign-up endpoint -> retunr json
-    path("API/sign-up/", Register_API.as_view(), name="sign_up_api"),  
+    path("API/sign-up/", Register_API.as_view(), name="sign_up_api"),
     # Tested: 3/4
     # TODO:
     # - add test_username_or_email_already_taken_fail
