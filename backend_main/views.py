@@ -121,18 +121,15 @@ class Process_API_kill(APIView):
                 kill_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-
         #############################################
         if settings.DUMMY_PROCESS_DATA:
             return Response(
-                    {"OK": "testing ok"},
-                    status=status.HTTP_201_CREATED,
-                )
+                {"OK": "testing ok"},
+                status=status.HTTP_201_CREATED,
+            )
         #############################################
 
         processes = get_process_info()
-
-
 
         if request.headers.get("HX-Request") == "true":
             return render(
