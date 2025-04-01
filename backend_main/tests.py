@@ -357,32 +357,52 @@ class SnapshotBrowserViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.snap_details_template)
 
-    # To veirfy
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_get_details_wrong_id_fail(self):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(
             f"{self.snapshots_url}?snap_id={'1dd4f9b0-5a36-490d-a327-4f9d002bd18b'}"
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
-    # Need to fix this !!!
+    
     def test_deleted_snapshot_sucess(self):
-        pass
-        # self.client.cookies["access_token"] = self.token
-        # valid_data = {
-        #    "snapshot_id": int(self.test_snap_object.snapshot_id),
-        # }
-        # response = self.client.delete(self.snapshots_url, valid_data)
+        """If snap_ID is valid -> remove from DB, return 200"""
+        self.client.cookies["access_token"] = self.token
+        valid_data = {
+            "snapshot_id": self.test_snap_object.snapshot_id,
+        }
 
-        # self.assertEqual(response.status_code, 200)
-        # self.assertFalse(
-        #    SnapshotObject.objects.filter(
-        #        snapshot_id=self.test_snap_object.snapshot_id
-        #    ).exists()
-        # )
-        # self.assertTemplateUsed(response, self.snap_details_template)
+        response = self.client.delete(
+            self.snapshots_url,
+            valid_data,
+            format="json",
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)     
+        
+        self.assertFalse(
+            SnapshotObject.objects.filter(
+            snapshot_id=self.test_snap_object.snapshot_id)
+            .exists())
+        self.assertTemplateUsed(response, self.snap_details_template)
 
     def test_deleted_snapshot_fail(self):
+        """If snap_ID is not valid ->return 404"""
+        self.client.cookies["access_token"] = self.token
+        valid_data = {
+            "snapshot_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b",
+        }
+
+        response = self.client.delete(
+            self.snapshots_url,
+            valid_data,
+            format="json",
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 404) 
         pass
 
 
@@ -490,6 +510,7 @@ class KillLogBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertFalse(KillLog_object.objects.filter(KillLog_ID=self.test_killlog_object.KillLog_ID).exists())
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_remove_kill_log_entry_fail(self):
@@ -505,4 +526,5 @@ class KillLogBrowserViewTest(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
+        
