@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import pathlib
@@ -287,7 +287,10 @@ class ProcessBrowserSnapAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-    # To fix
+
+
+##############################################################################
+    #@override_settings(ALLOWED_HOSTS=["otherserver"])
     def test_take_snapshot_sucess(self):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.take_snapshot_api)
@@ -297,6 +300,8 @@ class ProcessBrowserSnapAPITest(TestCase):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.take_snapshot_api)
         self.assertEqual(response.status_code, 500)
+
+###############################################################################
 
 
 ########## Snapshot browser ##########
