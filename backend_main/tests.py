@@ -220,10 +220,11 @@ class ProcessBrowserViewTest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_get_partial_view(self):
         self.client.cookies["access_token"] = self.token
-        response = self.client.get(self.proc_browser_view, headers={"HX-Request": "true"})
+        response = self.client.get(
+            self.proc_browser_view, headers={"HX-Request": "true"}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.proc_table_template)
-        
 
 
 class ProcessBrowserKillAPITest(TestCase):
@@ -256,14 +257,12 @@ class ProcessBrowserKillAPITest(TestCase):
         # TODO: test killing process with sucess
         pass
 
-
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_kill_process_invalid_pid_fail(self):
         self.client.cookies["access_token"] = self.token
         self.valid_data["pid"] = "2137"
         response = self.client.post(self.kill_proc_api, self.valid_data)
         self.assertEqual(response.status_code, 404)
-        
 
 
 class ProcessBrowserSnapAPITest(TestCase):
