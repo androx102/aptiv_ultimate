@@ -21,46 +21,38 @@ urlpatterns = [
     #
     ########## Process browser ##########
     # 1. Display page and processes data table -> return htmx
-    path("processes/", Process_browser_view.as_view(), name="processes"),  
+    path("processes/", Process_browser_view.as_view(), name="processes"),
     # Tested: 1/3
     # TODO:
     # - add test for partial render
     # 2. Take snapshot -> return json
-    path(
-        "API/processes/snap/", Process_API_snap.as_view(), name="take_snapshot"
-    ),  
+    path("API/processes/snap/", Process_API_snap.as_view(), name="take_snapshot"),
     # Tested: 1/3
     # TODO:
     # - add test for take_snapshot_sucess
     # - add test for take_snapshot_fail
     # Kill process -> return json
-    path(
-        "API/processes/kill/", Process_API_kill.as_view(), name="kill_proc"
-    ),  
+    path("API/processes/kill/", Process_API_kill.as_view(), name="kill_proc"),
     # Tested: 1/3
     # TODO:
     # - add test for kill_process_sucess
     # - add test for kill_process_fail
     ########## Snapshot browser ##########
     # 1. Display page -> return htmx
-    path(
-        "snapshots/", Snapshot_browser_view.as_view(), name="snapshots"
-    ),  
+    path("snapshots/", Snapshot_browser_view.as_view(), name="snapshots"),
     # Tested: 4/6
     # TODO:
     # - add test for delete_snapshot_sucess
     # - add test for delete_snapshot_fail
     # 2. Export to excel -> return file
-    path(
-        "API/snap/excel/", Snapshot_API_export.as_view(), name="export_snap"
-    ),  
+    path("API/snap/excel/", Snapshot_API_export.as_view(), name="export_snap"),
     # Tested: 1/3
     # TODO:
     # - add test for export_snapshot_sucess
     # - add test for export_snapshot_fail
     ########## Kill log interface ##########
     # 1. Display page -> return htmx
-    path("kill-log/", Kill_Log_browser_view.as_view(), name="kill-log"),  
+    path("kill-log/", Kill_Log_browser_view.as_view(), name="kill-log"),
     # Tested: 4/4
     ########## Auth ##########
     # 1. Sign-in page -> return htmx

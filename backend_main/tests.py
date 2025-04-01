@@ -365,7 +365,6 @@ class SnapshotBrowserViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    
     def test_deleted_snapshot_sucess(self):
         """If snap_ID is valid -> remove from DB, return 200"""
         self.client.cookies["access_token"] = self.token
@@ -380,12 +379,13 @@ class SnapshotBrowserViewTest(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 200)     
-        
+        self.assertEqual(response.status_code, 200)
+
         self.assertFalse(
             SnapshotObject.objects.filter(
-            snapshot_id=self.test_snap_object.snapshot_id)
-            .exists())
+                snapshot_id=self.test_snap_object.snapshot_id
+            ).exists()
+        )
         self.assertTemplateUsed(response, self.snap_details_template)
 
     def test_deleted_snapshot_fail(self):
@@ -402,7 +402,7 @@ class SnapshotBrowserViewTest(TestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 404) 
+        self.assertEqual(response.status_code, 404)
         pass
 
 
@@ -510,7 +510,11 @@ class KillLogBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(KillLog_object.objects.filter(KillLog_ID=self.test_killlog_object.KillLog_ID).exists())
+        self.assertFalse(
+            KillLog_object.objects.filter(
+                KillLog_ID=self.test_killlog_object.KillLog_ID
+            ).exists()
+        )
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_remove_kill_log_entry_fail(self):
@@ -527,4 +531,3 @@ class KillLogBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
-        
