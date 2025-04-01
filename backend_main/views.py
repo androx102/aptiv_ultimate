@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import pathlib
+from django.conf import settings
 from .models import ProcessObject, SnapshotObject, KillLog_object
 from .auth_utils import ban_token, get_tokens_for_user
 from .serializers import (
@@ -128,7 +129,7 @@ class Process_API_kill(APIView):
                     status=status.HTTP_201_CREATED,
                 )
         #############################################
-        
+
         processes = get_process_info()
 
 
