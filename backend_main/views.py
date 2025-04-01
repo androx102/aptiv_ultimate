@@ -96,8 +96,15 @@ class Process_API_kill(APIView):
         kill_log_serializer = KillLogSerializer(data=killLogData)
 
         if kill_log_serializer.is_valid():
+            
             status_, message_ = kill_proc_by_id(int(pid))
-            kill_log = kill_log_serializer.save()
+            if status_ == True:
+                kill_log = kill_log_serializer.save()
+            else:
+                return Response(
+                    {"ERROR": f"Could not kill process due: {message_}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             return Response(
                 kill_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST

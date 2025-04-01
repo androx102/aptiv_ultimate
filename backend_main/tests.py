@@ -262,7 +262,7 @@ class ProcessBrowserKillAPITest(TestCase):
         self.client.cookies["access_token"] = self.token
         self.valid_data["pid"] = "2137"
         response = self.client.post(self.kill_proc_api, self.valid_data)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
 
 class ProcessBrowserSnapAPITest(TestCase):
