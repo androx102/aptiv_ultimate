@@ -1,4 +1,4 @@
-from django.test import TestCase, Client, override_settings
+from django.test import TestCase, Client
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -265,6 +265,7 @@ class ProcessBrowserKillAPITest(TestCase):
         response = self.client.post(self.kill_proc_api, self.valid_data)
         self.assertEqual(response.status_code, 400)
 
+
 ####################################################################################
 class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
     @classmethod
@@ -279,14 +280,13 @@ class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
 
     def setUp(self):
         self.client = Client()
-    
+
     @classmethod
     def tearDownClass(cls):
         cls.selenium.quit()
         super().tearDownClass()
 
-
-   # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         valid_data = {
@@ -342,6 +342,8 @@ class ProcessBrowserSnapAPITest(TestCase):
     def test_take_snapshot_fail(self):
         # TODO: create snapshot fail
         pass
+
+
 ########## Snapshot browser ##########
 class SnapshotBrowserViewTest(TestCase):
     @classmethod
