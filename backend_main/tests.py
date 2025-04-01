@@ -283,25 +283,23 @@ class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.selenium.quit()
         super().tearDownClass()
 
     # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
-        valid_data = {
-            "snapshot_author": self.user,
-        }
-
-        response = self.client.post(self.take_snapshot_api, valid_data)
+        response = self.client.get(self.take_snapshot_api)
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
     # To fix
     def test_take_snapshot_sucess(self):
-        # TODO: create snapshot with sucess
-        pass
+        self.client.cookies["access_token"] = self.token
+        response = self.client.get(self.take_snapshot_api)
+        self.assertEqual(response.status_code, 200)
+        
+        
 
     def test_take_snapshot_fail(self):
         # TODO: create snapshot fail
@@ -325,11 +323,7 @@ class ProcessBrowserSnapAPITest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
-        valid_data = {
-            "snapshot_author": self.user,
-        }
-
-        response = self.client.post(self.take_snapshot_api, valid_data)
+        response = self.client.get(self.take_snapshot_api)
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
@@ -385,14 +379,14 @@ class SnapshotBrowserViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.snapshots_template)
 
-    # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    # def test_details_acess_denied(self):
-    #    """If user is not logged in, they should  be redirected to the the login page."""
-    #    response = self.client.get(
-    #        f"{self.snapshots_url}?snap_id={self.test_snap_object.snapshot_id}"
-    #    )
-    #    self.assertEqual(response.status_code, 302)
-    #    self.assertRedirects(response, self.sing_in_url)
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    def test_details_acess_denied(self):
+        """If user is not logged in, they should  be redirected to the the login page."""
+        response = self.client.get(
+            f"{self.snapshots_url}?snap_id={self.test_snap_object.snapshot_id}"
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.sing_in_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_get_details_correct_id_sucess(self):
@@ -452,7 +446,7 @@ class SnapshotBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
-        pass
+        
 
 
 ################ DRAFTS ################
