@@ -1,6 +1,4 @@
 from django.test import TestCase, Client
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import LiveServerTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import pathlib
@@ -267,12 +265,6 @@ class ProcessBrowserKillAPITest(TestCase):
         self.assertEqual(response.status_code, 500)
 
 
-
-
-
-
-
-
 ####################################################################################
 class ProcessBrowserSnapAPITest(TestCase):
     @classmethod
@@ -415,7 +407,6 @@ class SnapshotBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
-        
 
 
 ################ DRAFTS ################

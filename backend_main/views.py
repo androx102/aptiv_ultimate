@@ -34,10 +34,12 @@ class index(APIView):
 
 class Process_browser_view(APIView):
     def get(self, request):
-
         status_, processes_data = get_process_info()
         if status_ == False:
-            return Response({"ERROR": f"Snapshot failed due: {processes_data}"}, status=status.HTTP_500_BAD_REQUEST)
+            return Response(
+                {"ERROR": f"Snapshot failed due: {processes_data}"},
+                status=status.HTTP_500_BAD_REQUEST,
+            )
 
         if request.headers.get("HX-Request") == "true":
             return render(
@@ -64,7 +66,10 @@ class Process_API_snap(APIView):
 
         status_, processes_data = get_process_info()
         if status_ == False:
-            return Response({"ERROR": f"Snapshot failed due: {processes_data}"}, status=status.HTTP_500_BAD_REQUEST)
+            return Response(
+                {"ERROR": f"Snapshot failed due: {processes_data}"},
+                status=status.HTTP_500_BAD_REQUEST,
+            )
 
         for proces in processes_data:
             proces["snapshot"] = snap.snapshot_id
