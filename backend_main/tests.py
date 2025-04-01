@@ -444,13 +444,15 @@ class KillLogBrowserViewTest(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.test_snap_object = SnapshotObject.objects.create(
-            snapshot_author=self.user,
+        self.test_killlog_object = KillLog_object.objects.create(
+            KillLog_Author=self.user,
+            KillLog_Process_Name="test process",
+            KillLog_Process_Id=2137,
         )
 
         self.assertTrue(
-            SnapshotObject.objects.filter(
-                snapshot_id=self.test_snap_object.snapshot_id
+            KillLog_object.objects.filter(
+                KillLog_ID=self.test_killlog_object.KillLog_ID
             ).exists()
         )
 
@@ -470,7 +472,22 @@ class KillLogBrowserViewTest(TestCase):
 
     # To fix
     def test_remove_kill_log_entry_sucess(self):
-        pass
+        """If kill_id is valid -> remove from DB, return 200"""
+        self.client.cookies["access_token"] = self.token
+        valid_data={
+            "kill_id":self.test_killlog_object.KillLog_ID,
+        }
+        response = self.client.delete(self.kill_log_url,valid_data )
+
+        self.assertEqual(response.status_code, 200)
+        
 
     def test_remove_kill_log_entry_fail(self):
-        pass
+        """If kill_id is not valid -> return 400"""
+        self.client.cookies["access_token"] = self.token
+        not_valid_data={
+            "kill_id":"1dd4f9b0-5a36-490d-a327-4f9d002bd18b",
+        }
+        response = self.client.delete(self.kill_log_url,not_valid_data )
+
+        self.assertEqual(response.status_code, 400)
