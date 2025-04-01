@@ -127,7 +127,6 @@ class Process_API_kill(APIView):
                 status=status.HTTP_500_BAD_REQUEST,
             )
 
-
         if request.headers.get("HX-Request") == "true":
             return render(
                 request,

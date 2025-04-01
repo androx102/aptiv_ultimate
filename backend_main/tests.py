@@ -290,7 +290,6 @@ class ProcessBrowserSnapAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-
     ##############################
     # TO FIX !!!!!
     @override_settings(DUMMY_PROCESS_DATA=True)
