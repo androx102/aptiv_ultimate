@@ -40,14 +40,13 @@ class Process_browser_view(APIView):
                 request,
                 f"{partials_dir}/proc_table.html",
                 {"processes": processes},
-                )
+            )
         else:
             return render(
                 request,
                 f"{templates_dir}/proc-browser.html",
                 {"processes": processes},
             )
-
 
 
 class Process_API_snap(APIView):
@@ -73,10 +72,9 @@ class Process_API_snap(APIView):
             return Response(
                 {"Message": "Snapshot created sucesfully"},
                 status=status.HTTP_200_OK,
-                )
+            )
         else:
             return Response(proc_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class Process_API_kill(APIView):
@@ -89,13 +87,13 @@ class Process_API_kill(APIView):
             return Response(
                 {"ERROR": "Must provide PID"},
                 status=status.HTTP_400_BAD_REQUEST,
-                )
+            )
 
         killLogData = {
             "KillLog_Author": user_id,
             "KillLog_Process_Name": proc_name,
             "KillLog_Process_Id": pid,
-            }
+        }
 
         kill_log_serializer = KillLogSerializer(data=killLogData)
 
@@ -103,7 +101,9 @@ class Process_API_kill(APIView):
             status_, message_ = kill_proc_by_id(int(pid))
             kill_log = kill_log_serializer.save()
         else:
-            return Response(kill_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                kill_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
         processes = get_process_info()
         if request.headers.get("HX-Request") == "true":
@@ -111,7 +111,7 @@ class Process_API_kill(APIView):
                 request,
                 f"{partials_dir}/proc_table.html",
                 {"processes": processes},
-                )
+            )
 
 
 class Snapshot_browser_view(APIView):
@@ -120,19 +120,19 @@ class Snapshot_browser_view(APIView):
 
         if snap_id != None:
             snapshot = get_object_or_404(SnapshotObject, snapshot_id=snap_id)
-            processes = get_list_or_404(ProcessObject,snapshot=snapshot)
+            processes = get_list_or_404(ProcessObject, snapshot=snapshot)
             return render(
                 request,
                 f"{templates_dir}/snap_details.html",
                 {"snapshot": snapshot, "processes": processes},
-                )
+            )
         else:
             snapshots = SnapshotObject.objects.all()
             return render(
                 request,
                 f"{templates_dir}/snapshots.html",
                 {"snapshots": snapshots},
-                )
+            )
 
     def delete(self, request):
         snapshot_id = request.data.get("snapshot_id")
@@ -150,7 +150,8 @@ class Snapshot_browser_view(APIView):
             request,
             f"{partials_dir}/snap_table.html",
             {"snapshots": snapshots},
-            )
+        )
+
 
 class Snapshot_API_export(APIView):
     def get(self, request):
@@ -159,16 +160,15 @@ class Snapshot_API_export(APIView):
             return Response(
                 {"ERROR": "Snapshot ID not provided"},
                 status=status.HTTP_400_BAD_REQUEST,
-                )
+            )
 
         status_, resp_ = create_excel(snap_id)
         if status_ != True:
             return Response(
                 {"ERROR": f"{resp_}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
+            )
         return resp_
-
 
 
 class Kill_Log_browser_view(APIView):
@@ -187,7 +187,8 @@ class Kill_Log_browser_view(APIView):
         kill_entry = get_object_or_404(KillLog_object, KillLog_ID=kill_id)
         kill_entry.delete()
         return Response({"OK": "Kill entry removed"}, status=status.HTTP_200_OK)
-        
+
+
 ###########################################################################
 # Auth methods
 
@@ -217,12 +218,9 @@ class Register_API(APIView):
             usr_serializer.save()
             return Response(
                 {"OK": "User created sucesfully"}, status=status.HTTP_201_CREATED
-                )
+            )
         else:
-            return Response(
-                usr_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                )
-
+            return Response(usr_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Login_view(APIView):

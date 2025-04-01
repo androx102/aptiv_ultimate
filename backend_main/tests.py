@@ -12,6 +12,7 @@ partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials
 
 SKIP_OLD_TESTS = False
 
+
 ########## Auth ##########
 class LoginViewTest(TestCase):
     @classmethod
