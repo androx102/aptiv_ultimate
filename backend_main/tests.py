@@ -134,7 +134,7 @@ class RegisterAPITest(TestCase):
         cls.user = get_user_model().objects.create_user(
             username="testuser", password="testpass", email="testuser@example.com"
         )
-        #cls.assertIsNotNone(user)
+        # cls.assertIsNotNone(user)
         cls.token = str(AccessToken.for_user(cls.user))
 
     def setUp(self):
