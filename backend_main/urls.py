@@ -40,7 +40,7 @@ urlpatterns = [
     ########## Snapshot browser ##########
     # 1. Display page -> return htmx
     path("snapshots/", Snapshot_browser_view.as_view(), name="snapshots"),
-    # Tested: 6/6 
+    # Tested: 6/6
     # 2. Export to excel -> return file
     path("API/snap/excel/", Snapshot_API_export.as_view(), name="export_snap"),
     # Tested: 1/3

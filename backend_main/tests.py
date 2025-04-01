@@ -439,7 +439,6 @@ class SnapshotExportAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
-    
     def test_export_snapshot_sucess(self):
         self.client.cookies["access_token"] = self.token
         valid_data = {"snap_id": self.test_snap_object.snapshot_id}
@@ -447,15 +446,20 @@ class SnapshotExportAPITest(TestCase):
         response = self.client.get(self.snapshots_export_url, valid_data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Disposition'], f'attachment; filename="snapshot_{self.test_snap_object.snapshot_id}.xlsx"')        
-        self.assertEqual(response['Content-Type'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        
+        self.assertEqual(
+            response["Content-Disposition"],
+            f'attachment; filename="snapshot_{self.test_snap_object.snapshot_id}.xlsx"',
+        )
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
     def test_export_snapshot_fail(self):
         self.client.cookies["access_token"] = self.token
         not_valid_data = {"snap_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b"}
 
         response = self.client.get(self.snapshots_export_url, not_valid_data)
-        
 
 
 class KillLogBrowserViewTest(TestCase):
