@@ -68,7 +68,7 @@ class Process_API_snap(APIView):
         if status_ == False:
             return Response(
                 {"ERROR": f"Snapshot failed due: {processes_data}"},
-                status=status.HTTP_300_BAD_REQUEST,
+                status=status.HTTP_200_OK,
             )
 
         for proces in processes_data:
