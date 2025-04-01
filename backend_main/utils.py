@@ -33,9 +33,9 @@ def get_process_info():
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
 
-        return true, process_list
+        return True, process_list
     except Exception as e:
-        return falese, f"{e}"
+        return False, f"{e}"
 
 
 def kill_proc_by_id(pid):
