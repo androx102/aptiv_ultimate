@@ -59,15 +59,14 @@ class LoginAPITest(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.valid_data = {"username": "testuser", "password": "testpass"}
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_redirect_for_logged_user(self):
         """If the user is already logged in, they should be redirected to the index page."""
         self.client.cookies["access_token"] = self.token
 
-        response = self.client.post(
-            self.sing_in_api_url, {"username": "testuser", "password": "testpass"}
-        )
+        response = self.client.post(self.sing_in_api_url, self.valid_data)
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
@@ -75,9 +74,7 @@ class LoginAPITest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_in_sucess(self):
         """Valid credentials should log in the user, set cookies, and redirect to index."""
-        response = self.client.post(
-            self.sing_in_api_url, {"username": "testuser", "password": "testpass"}
-        )
+        response = self.client.post(self.sing_in_api_url, self.valid_data)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("access_token", response.cookies)
@@ -86,9 +83,8 @@ class LoginAPITest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_in_invalid_credentials_fail(self):
         """Invalid credentials should return a 401 Unauthorized status."""
-        response = self.client.post(
-            self.sing_in_api_url, {"username": "testuser", "password": "wrongpass"}
-        )
+        self.valid_data["password"] = "wrongpassword"
+        response = self.client.post(self.sing_in_api_url, self.valid_data)
 
         self.assertEqual(response.status_code, 401)
         self.assertNotIn("access_token", response.cookies)
@@ -134,7 +130,6 @@ class RegisterAPITest(TestCase):
         cls.user = get_user_model().objects.create_user(
             username="testuser", password="testpass", email="testuser@example.com"
         )
-        # cls.assertIsNotNone(user)
         cls.token = str(AccessToken.for_user(cls.user))
 
     def setUp(self):
@@ -201,6 +196,7 @@ class ProcessBrowserViewTest(TestCase):
         cls.proc_browser_view = reverse("processes")
         cls.sing_in_url = reverse("sign_in")
         cls.proc_browser_template = f"{templates_dir}/proc-browser.html"
+        cls.proc_table_template = f"{partials_dir}/proc_table.html"
 
     def setUp(self):
         self.client = Client()
@@ -221,9 +217,13 @@ class ProcessBrowserViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.proc_browser_template)
 
-    # To fix
-    def test_partial_render_table(self):
-        pass
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    def test_get_partial_view(self):
+        self.client.cookies["access_token"] = self.token
+        response = self.client.get(self.proc_browser_view, headers={"HX-Request": "true"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, self.proc_table_template)
+        
 
 
 class ProcessBrowserKillAPITest(TestCase):
@@ -238,17 +238,15 @@ class ProcessBrowserKillAPITest(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.valid_data = {
+            "pid": 2137,
+            "proc_name": "test_proc_name",
+        }
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
-        valid_data = {
-            "KillLog_Author": self.user,
-            "KillLog_Process_Name": "proc_name",
-            "KillLog_Process_Id": 2137,
-        }
-
-        response = self.client.post(self.kill_proc_api, valid_data)
+        response = self.client.post(self.kill_proc_api, self.valid_data)
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
@@ -258,9 +256,14 @@ class ProcessBrowserKillAPITest(TestCase):
         # TODO: test killing process with sucess
         pass
 
-    def test_kill_process_fail(self):
-        # TODO: test killing process failed due to worng PID
-        pass
+
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    def test_kill_process_invalid_pid_fail(self):
+        self.client.cookies["access_token"] = self.token
+        self.valid_data["pid"] = "2137"
+        response = self.client.post(self.kill_proc_api, self.valid_data)
+        self.assertEqual(response.status_code, 404)
+        
 
 
 class ProcessBrowserSnapAPITest(TestCase):

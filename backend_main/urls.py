@@ -22,7 +22,7 @@ urlpatterns = [
     ########## Process browser ##########
     # 1. Display page and processes data table -> return htmx
     path("processes/", Process_browser_view.as_view(), name="processes"),
-    # Tested: 1/3
+    # Tested: 2/3
     # TODO:
     # - add test for partial render
     # 2. Take snapshot -> return json
@@ -60,9 +60,7 @@ urlpatterns = [
     # Tested: 2/2
     # 4. Sign-up endpoint -> retunr json
     path("API/sign-up/", Register_API.as_view(), name="sign_up_api"),
-    # Tested: 3/4
-    # TODO:
-    # - add test_username_or_email_already_taken_fail
+    # Tested: 4/4
     # 5. Logout
     path("API/log-out/", Log_out_API.as_view(), name="logout"),
     # Tested: 0/2
