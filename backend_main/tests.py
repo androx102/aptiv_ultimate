@@ -1,13 +1,16 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+import pathlib
+import unittest
 from rest_framework_simplejwt.tokens import AccessToken
 from .models import *
-import pathlib
+
 
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
+SKIP_OLD_TESTS = False
 
 ########## Auth ##########
 class LoginViewTest(TestCase):
@@ -24,6 +27,7 @@ class LoginViewTest(TestCase):
     def setUp(self):
         self.client = Client()
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_redirect_for_logged_user(self):
         """If user is logged in, they should be redirected to the index page."""
         self.client.cookies["access_token"] = self.token
@@ -33,6 +37,7 @@ class LoginViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_dispaly_for_not_logged_user(self):
         """If user is not logged in, they should see the login page."""
         response = self.client.get(self.sign_in_url)
@@ -54,6 +59,7 @@ class LoginAPITest(TestCase):
     def setUp(self):
         self.client = Client()
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_redirect_for_logged_user(self):
         """If the user is already logged in, they should be redirected to the index page."""
         self.client.cookies["access_token"] = self.token
@@ -65,6 +71,7 @@ class LoginAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_logging_in_sucess(self):
         """Valid credentials should log in the user, set cookies, and redirect to index."""
         response = self.client.post(
@@ -75,6 +82,7 @@ class LoginAPITest(TestCase):
         self.assertIn("access_token", response.cookies)
         self.assertEqual(response.cookies["access_token"].value != "", True)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_logging_in_fail(self):
         """Invalid credentials should return a 401 Unauthorized status."""
         response = self.client.post(
@@ -100,6 +108,7 @@ class RegisterViewTest(TestCase):
     def setUp(self):
         self.client = Client()
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_redirect_for_logged_user(self):
         """If user is logged in, they should be redirected to the index page."""
         self.client.cookies["access_token"] = self.token
@@ -109,6 +118,7 @@ class RegisterViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_dispaly_for_not_logged_user(self):
         """If user is not logged in, they should see the sing-up page."""
         response = self.client.get(self.sign_up_url)
@@ -127,6 +137,7 @@ class RegisterAPITest(TestCase):
         self.sign_up_api_url = reverse("sign_up_api")
         self.index_url = reverse("index")
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_redirect_for_logged_user(self):
         """If user is logged in, they should be redirected to the index page."""
 
@@ -147,6 +158,7 @@ class RegisterAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_up_sucess(self):
         """Test that a valid sign-up request returns a 201 status code."""
         valid_data = {
@@ -162,6 +174,7 @@ class RegisterAPITest(TestCase):
         self.assertIsNotNone(user)
         self.assertEqual(user.email, "newuser@example.com")
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_up_fail(self):
         """Test that invalid data returns a 400 Bad Request status code."""
         invalid_data = {
@@ -191,12 +204,14 @@ class ProcessBrowserViewTest(TestCase):
     def setUp(self):
         self.client = Client()
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         response = self.client.get(self.proc_browser_view)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_has_acess(self):
         """If user logged in, they should see process browser page."""
         self.client.cookies["access_token"] = self.token
@@ -223,6 +238,7 @@ class ProcessBrowserKillAPITest(TestCase):
     def setUp(self):
         self.client = Client()
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         valid_data = {
@@ -259,6 +275,7 @@ class ProcessBrowserSnapAPITest(TestCase):
     def setUp(self):
         self.client = Client()
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         valid_data = {
@@ -305,12 +322,14 @@ class SnapshotBrowserViewTest(TestCase):
             ).exists()
         )
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         response = self.client.get(self.snapshots_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_has_access(self):
         """If user logged in, they should see snaphosts browser page."""
         self.client.cookies["access_token"] = self.token
@@ -318,6 +337,7 @@ class SnapshotBrowserViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.snapshots_template)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_details_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         response = self.client.get(
@@ -326,6 +346,7 @@ class SnapshotBrowserViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_details_correct_id(self):
         """If user logged in, they should see snaphosts details page."""
         self.client.cookies["access_token"] = self.token
@@ -383,6 +404,7 @@ class SnapshotExportAPITest(TestCase):
             ).exists()
         )
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         valid_data = {"snap_id": self.test_snap_object.snapshot_id}
         response = self.client.get(self.snapshots_export_url, valid_data)
@@ -431,11 +453,13 @@ class KillLogBrowserViewTest(TestCase):
             ).exists()
         )
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_acess_denied(self):
         response = self.client.get(self.kill_log_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_has_access(self):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.kill_log_url)
