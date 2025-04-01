@@ -1,4 +1,5 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import pathlib
@@ -264,7 +265,50 @@ class ProcessBrowserKillAPITest(TestCase):
         response = self.client.post(self.kill_proc_api, self.valid_data)
         self.assertEqual(response.status_code, 400)
 
+####################################################################################
+class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpClass()
+        cls.user = get_user_model().objects.create_user(
+            username="testuser", password="testpass"
+        )
+        cls.token = str(AccessToken.for_user(cls.user))
+        cls.take_snapshot_api = reverse("take_snapshot")
+        cls.sing_in_url = reverse("sign_in")
 
+    def setUp(self):
+        self.client = Client()
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super().tearDownClass()
+
+
+   # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    def test_acess_denied(self):
+        """If user is not logged in, they should  be redirected to the the login page."""
+        valid_data = {
+            "snapshot_author": self.user,
+        }
+
+        response = self.client.post(self.take_snapshot_api, valid_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.sing_in_url)
+
+    # To fix
+    def test_take_snapshot_sucess(self):
+        # TODO: create snapshot with sucess
+        pass
+
+    def test_take_snapshot_fail(self):
+        # TODO: create snapshot fail
+        pass
+
+
+####################################################################################
 class ProcessBrowserSnapAPITest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -298,8 +342,6 @@ class ProcessBrowserSnapAPITest(TestCase):
     def test_take_snapshot_fail(self):
         # TODO: create snapshot fail
         pass
-
-
 ########## Snapshot browser ##########
 class SnapshotBrowserViewTest(TestCase):
     @classmethod

@@ -31,10 +31,9 @@ urlpatterns = [
     # - add test for take_snapshot_fail
     # Kill process -> return json
     path("API/processes/kill/", Process_API_kill.as_view(), name="kill_proc"),
-    # Tested: 1/3
+    # Tested: 2/3
     # TODO:
     # - add test for kill_process_sucess
-    # - add test for kill_process_fail
     ########## Snapshot browser ##########
     # 1. Display page -> return htmx
     path("snapshots/", Snapshot_browser_view.as_view(), name="snapshots"),
