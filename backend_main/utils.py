@@ -2,11 +2,30 @@ import psutil
 import datetime
 import openpyxl
 from django.http import HttpResponse
+from django.conf import settings
 from .models import ProcessObject
 
 
 def get_process_info():
     process_list = []
+    if settings.DUMMY_PROCESS_DATA:
+        process_info = {
+            "process_id": 2137,
+            "process_status": sleeping,
+            "process_start_time":"2025-03-20 20:43:30",
+            "process_duration":2307000000,
+            "process_name":"test_proc",
+            "process_memory_usage":12,
+            "process_cpu_usage":0.1,
+        }
+        process_list.append(process_info)
+        process_list.append(process_info)
+        process_list.append(process_info)
+        return True, process_list
+
+
+
+
     try:
         for proc in psutil.process_iter(
             attrs=["pid", "status", "create_time", "name", "memory_info", "cpu_percent"]

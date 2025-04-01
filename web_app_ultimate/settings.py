@@ -68,6 +68,7 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY,
 }
 
+DUMMY_PROCESS_DATA = False
 AUTH_USER_MODEL = "backend_main.UserObject"
 
 

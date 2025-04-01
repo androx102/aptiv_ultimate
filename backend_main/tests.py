@@ -1,4 +1,5 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
+from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import pathlib
@@ -11,6 +12,10 @@ templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
 SKIP_OLD_TESTS = False
+
+
+
+
 
 
 ########## Auth ##########
@@ -288,12 +293,16 @@ class ProcessBrowserSnapAPITest(TestCase):
         self.assertRedirects(response, self.sing_in_url)
 
     ##############################################################################
-    # @override_settings(ALLOWED_HOSTS=["otherserver"])
+
+
+
+    @override_settings(DUMMY_PROCESS_DATA=True)
     def test_take_snapshot_sucess(self):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.take_snapshot_api)
         self.assertEqual(response.status_code, 200)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_take_snapshot_fail(self):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.take_snapshot_api)
