@@ -474,20 +474,19 @@ class KillLogBrowserViewTest(TestCase):
     def test_remove_kill_log_entry_sucess(self):
         """If kill_id is valid -> remove from DB, return 200"""
         self.client.cookies["access_token"] = self.token
-        valid_data={
-            "kill_id":self.test_killlog_object.KillLog_ID,
+        valid_data = {
+            "kill_id": self.test_killlog_object.KillLog_ID,
         }
-        response = self.client.delete(self.kill_log_url,valid_data )
+        response = self.client.delete(self.kill_log_url, valid_data)
 
         self.assertEqual(response.status_code, 200)
-        
 
     def test_remove_kill_log_entry_fail(self):
         """If kill_id is not valid -> return 400"""
         self.client.cookies["access_token"] = self.token
-        not_valid_data={
-            "kill_id":"1dd4f9b0-5a36-490d-a327-4f9d002bd18b",
+        not_valid_data = {
+            "kill_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b",
         }
-        response = self.client.delete(self.kill_log_url,not_valid_data )
+        response = self.client.delete(self.kill_log_url, not_valid_data)
 
         self.assertEqual(response.status_code, 400)
