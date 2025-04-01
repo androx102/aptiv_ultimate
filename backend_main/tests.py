@@ -1,8 +1,6 @@
 from django.test import TestCase, Client
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import LiveServerTestCase
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import pathlib
