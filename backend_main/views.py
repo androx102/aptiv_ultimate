@@ -34,7 +34,11 @@ class index(APIView):
 
 class Process_browser_view(APIView):
     def get(self, request):
-        processes = get_process_info()
+
+        status_, processes_data = get_process_info()
+        if status_ == False:
+            return Response({"ERROR": f"Snapshot failed due: {e}"}, status=status.HTTP_500_BAD_REQUEST)
+
         if request.headers.get("HX-Request") == "true":
             return render(
                 request,
@@ -58,9 +62,11 @@ class Process_API_snap(APIView):
         else:
             return Response(snap_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        processes = get_process_info()
+        status_, processes_data = get_process_info()
+        if status_ == False:
+            return Response({"ERROR": f"Snapshot failed due: {e}"}, status=status.HTTP_500_BAD_REQUEST)
 
-        for proces in processes:
+        for proces in processes_data:
             proces["snapshot"] = snap.snapshot_id
 
         proc_serializer = ProcessSerializer(data=processes, many=True)
@@ -102,7 +108,7 @@ class Process_API_kill(APIView):
             else:
                 return Response(
                     {"ERROR": f"Could not kill process due: {message_}"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    status=status.HTTP_500_BAD_REQUEST,
                 )
         else:
             return Response(

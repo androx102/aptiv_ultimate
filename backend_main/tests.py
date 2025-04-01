@@ -1,5 +1,8 @@
 from django.test import TestCase, Client
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import LiveServerTestCase
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import pathlib
@@ -263,45 +266,13 @@ class ProcessBrowserKillAPITest(TestCase):
         self.client.cookies["access_token"] = self.token
         self.valid_data["pid"] = "2137"
         response = self.client.post(self.kill_proc_api, self.valid_data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 500)
 
 
-####################################################################################
-class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
-    def setUp(self):
-        self.client = Client()
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.user = get_user_model().objects.create_user(
-            username="testuser", password="testpass"
-        )
-        cls.token = str(AccessToken.for_user(cls.user))
-        cls.take_snapshot_api = reverse("take_snapshot")
-        cls.sing_in_url = reverse("sign_in")
 
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
 
-    # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_acess_denied(self):
-        """If user is not logged in, they should  be redirected to the the login page."""
-        response = self.client.get(self.take_snapshot_api)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, self.sing_in_url)
-
-    # To fix
-    def test_take_snapshot_sucess(self):
-        self.client.cookies["access_token"] = self.token
-        response = self.client.get(self.take_snapshot_api)
-        self.assertEqual(response.status_code, 200)
-
-    def test_take_snapshot_fail(self):
-        # TODO: create snapshot fail
-        pass
 
 
 ####################################################################################
@@ -328,12 +299,14 @@ class ProcessBrowserSnapAPITest(TestCase):
 
     # To fix
     def test_take_snapshot_sucess(self):
-        # TODO: create snapshot with sucess
-        pass
+        self.client.cookies["access_token"] = self.token
+        response = self.client.get(self.take_snapshot_api)
+        self.assertEqual(response.status_code, 200)
 
     def test_take_snapshot_fail(self):
-        # TODO: create snapshot fail
-        pass
+        self.client.cookies["access_token"] = self.token
+        response = self.client.get(self.take_snapshot_api)
+        self.assertEqual(response.status_code, 500)
 
 
 ########## Snapshot browser ##########
@@ -444,6 +417,7 @@ class SnapshotBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+        
 
 
 ################ DRAFTS ################
