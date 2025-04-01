@@ -22,7 +22,7 @@ urlpatterns = [
     ########## Process browser ##########
     # 1. Display page and processes data table -> return htmx
     path("processes/", Process_browser_view.as_view(), name="processes"),
-    # Tested: 3/3  
+    # Tested: 3/3
     # 2. Take snapshot -> return json
     path("API/processes/snap/", Process_API_snap.as_view(), name="take_snapshot"),
     # Tested: 1/3

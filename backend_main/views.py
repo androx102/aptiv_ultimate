@@ -96,7 +96,6 @@ class Process_API_kill(APIView):
         kill_log_serializer = KillLogSerializer(data=killLogData)
 
         if kill_log_serializer.is_valid():
-            
             status_, message_ = kill_proc_by_id(int(pid))
             if status_ == True:
                 kill_log = kill_log_serializer.save()
