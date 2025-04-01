@@ -1,5 +1,4 @@
 from django.test import TestCase, Client, override_settings
-from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 import pathlib
@@ -12,10 +11,6 @@ templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
 SKIP_OLD_TESTS = False
-
-
-
-
 
 
 ########## Auth ##########
@@ -295,8 +290,6 @@ class ProcessBrowserSnapAPITest(TestCase):
         self.assertRedirects(response, self.sing_in_url)
 
     ##############################################################################
-
-
 
     @override_settings(DUMMY_PROCESS_DATA=True)
     def test_take_snapshot_sucess(self):

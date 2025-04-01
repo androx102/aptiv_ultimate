@@ -12,19 +12,16 @@ def get_process_info():
         process_info = {
             "process_id": 2137,
             "process_status": "sleeping",
-            "process_start_time":"2025-03-20 20:43:30",
-            "process_duration":2307000000,
-            "process_name":"test_proc",
-            "process_memory_usage":12,
-            "process_cpu_usage":0.1,
+            "process_start_time": "2025-03-20 20:43:30",
+            "process_duration": 2307000000,
+            "process_name": "test_proc",
+            "process_memory_usage": 12,
+            "process_cpu_usage": 0.1,
         }
         process_list.append(process_info)
         process_list.append(process_info)
         process_list.append(process_info)
         return True, process_list
-
-
-
 
     try:
         for proc in psutil.process_iter(
@@ -63,7 +60,6 @@ def kill_proc_by_id(pid):
             return True, "Proc killed sucesfully"
         else:
             return False, f"Proc with PID: {pid} is not existing"
-
 
     try:
         # Get proc to kill by PID
