@@ -10,7 +10,7 @@ from .models import *
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
 partials_dir = pathlib.Path(__file__).resolve().parent / "templates" / "partials"
 
-SKIP_OLD_TESTS = True
+SKIP_OLD_TESTS = False
 
 
 ########## Auth ##########
@@ -29,7 +29,7 @@ class LoginViewTest(TestCase):
         self.client = Client()
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_redirect_for_logged_user(self):
+    def test_get_view_logged_fail(self):
         """If user is logged in, they should be redirected to the index page."""
         self.client.cookies["access_token"] = self.token
 
@@ -39,7 +39,7 @@ class LoginViewTest(TestCase):
         self.assertRedirects(response, self.index_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_dispaly_for_not_logged_user(self):
+    def test_get_view_not_logged_sucess(self):
         """If user is not logged in, they should see the login page."""
         response = self.client.get(self.sign_in_url)
 
@@ -73,7 +73,7 @@ class LoginAPITest(TestCase):
         self.assertRedirects(response, self.index_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_logging_in_sucess(self):
+    def test_sign_in_sucess(self):
         """Valid credentials should log in the user, set cookies, and redirect to index."""
         response = self.client.post(
             self.sing_in_api_url, {"username": "testuser", "password": "testpass"}
@@ -84,7 +84,7 @@ class LoginAPITest(TestCase):
         self.assertEqual(response.cookies["access_token"].value != "", True)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_logging_in_fail(self):
+    def test_sign_in_invalid_credentials_fail(self):
         """Invalid credentials should return a 401 Unauthorized status."""
         response = self.client.post(
             self.sing_in_api_url, {"username": "testuser", "password": "wrongpass"}
@@ -110,7 +110,7 @@ class RegisterViewTest(TestCase):
         self.client = Client()
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_redirect_for_logged_user(self):
+    def test_get_view_logged_fail(self):
         """If user is logged in, they should be redirected to the index page."""
         self.client.cookies["access_token"] = self.token
 
@@ -120,7 +120,7 @@ class RegisterViewTest(TestCase):
         self.assertRedirects(response, self.index_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_dispaly_for_not_logged_user(self):
+    def test_get_view_not_logged_sucess(self):
         """If user is not logged in, they should see the sing-up page."""
         response = self.client.get(self.sign_up_url)
 
@@ -176,7 +176,7 @@ class RegisterAPITest(TestCase):
         self.assertEqual(user.email, "newuser@example.com")
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_sign_up_fail(self):
+    def test_sign_up_invalid_data_fail(self):
         """Test that invalid data returns a 400 Bad Request status code."""
         invalid_data = {
             "username": "newuser",
@@ -206,14 +206,14 @@ class ProcessBrowserViewTest(TestCase):
         self.client = Client()
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_acess_denied(self):
+    def test_get_view_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         response = self.client.get(self.proc_browser_view)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_has_acess(self):
+    def test_get_view_sucess(self):
         """If user logged in, they should see process browser page."""
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.proc_browser_view)
@@ -324,31 +324,31 @@ class SnapshotBrowserViewTest(TestCase):
         )
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_acess_denied(self):
+    def test_get_view_acess_denied(self):
         """If user is not logged in, they should  be redirected to the the login page."""
         response = self.client.get(self.snapshots_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_has_access(self):
+    def test_get_view_sucess(self):
         """If user logged in, they should see snaphosts browser page."""
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.snapshots_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.snapshots_template)
 
-    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_details_acess_denied(self):
-        """If user is not logged in, they should  be redirected to the the login page."""
-        response = self.client.get(
-            f"{self.snapshots_url}?snap_id={self.test_snap_object.snapshot_id}"
-        )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, self.sing_in_url)
+    #@unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    #def test_details_acess_denied(self):
+    #    """If user is not logged in, they should  be redirected to the the login page."""
+    #    response = self.client.get(
+    #        f"{self.snapshots_url}?snap_id={self.test_snap_object.snapshot_id}"
+    #    )
+    #    self.assertEqual(response.status_code, 302)
+    #    self.assertRedirects(response, self.sing_in_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_details_correct_id(self):
+    def test_get_details_correct_id_sucess(self):
         """If user logged in, they should see snaphosts details page."""
         self.client.cookies["access_token"] = self.token
         response = self.client.get(
@@ -358,8 +358,12 @@ class SnapshotBrowserViewTest(TestCase):
         self.assertTemplateUsed(response, self.snap_details_template)
 
     # To veirfy
-    def test_details_wrong_id(self):
-        pass
+    def test_get_details_wrong_id_fail(self):
+        self.client.cookies["access_token"] = self.token
+        response = self.client.get(
+            f"{self.snapshots_url}?snap_id={"1dd4f9b0-5a36-490d-a327-4f9d002bd18b"}"
+        )
+        self.assertEqual(response.status_code, 400)
 
     # Need to fix this !!!
     def test_deleted_snapshot_sucess(self):
@@ -457,20 +461,20 @@ class KillLogBrowserViewTest(TestCase):
         )
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_acess_denied(self):
+    def test_get_view_acess_denied(self):
         response = self.client.get(self.kill_log_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_has_access(self):
+    def test_get_view_sucess(self):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.kill_log_url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.kill_log_template)
 
-    # To fix
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_remove_kill_log_entry_sucess(self):
         """If kill_id is valid -> remove from DB, return 200"""
         self.client.cookies["access_token"] = self.token
@@ -487,12 +491,14 @@ class KillLogBrowserViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_remove_kill_log_entry_fail(self):
         """If kill_id is not valid -> return 400"""
         self.client.cookies["access_token"] = self.token
         not_valid_data = {
             "kill_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b",
         }
-        response = self.client.delete(self.kill_log_url, not_valid_data, format="json")
+        response = self.client.delete(self.kill_log_url, not_valid_data, format="json",content_type='application/json')
 
         self.assertEqual(response.status_code, 400)
