@@ -478,8 +478,13 @@ class KillLogBrowserViewTest(TestCase):
         valid_data = {
             "kill_id": self.test_killlog_object.KillLog_ID,
         }
-         
-        response = self.client.delete(self.kill_log_url, data=json.dumps(valid_data), format="json",content_type='application/json')
+
+        response = self.client.delete(
+            self.kill_log_url,
+            data=json.dumps(valid_data),
+            format="json",
+            content_type="application/json",
+        )
 
         self.assertEqual(response.status_code, 200)
 
