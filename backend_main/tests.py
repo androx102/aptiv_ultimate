@@ -298,8 +298,6 @@ class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.take_snapshot_api)
         self.assertEqual(response.status_code, 200)
-        
-        
 
     def test_take_snapshot_fail(self):
         # TODO: create snapshot fail
@@ -446,7 +444,6 @@ class SnapshotBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
-        
 
 
 ################ DRAFTS ################
