@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import render, get_object_or_404
 import pathlib
 from .models import ProcessObject, SnapshotObject, KillLog_object
 from .auth_utils import ban_token, get_tokens_for_user
@@ -120,11 +120,9 @@ class Snapshot_browser_view(APIView):
 
         if snap_id != None:
             snapshot = get_object_or_404(SnapshotObject, snapshot_id=snap_id)
-            
-            
+
             processes = ProcessObject.objects.filter(snapshot=snapshot)
-            
-            
+
             return render(
                 request,
                 f"{templates_dir}/snap_details.html",
