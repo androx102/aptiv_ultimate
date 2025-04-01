@@ -37,7 +37,7 @@ class Process_browser_view(APIView):
         status_, processes_data = get_process_info()
         if status_ == False:
             return Response(
-                {"ERROR": f"Snapshot failed due: {processes_data}"},
+                {"ERROR": f"Process fetching failed due: {processes_data}"},
                 status=status.HTTP_500_BAD_REQUEST,
             )
 
@@ -120,19 +120,25 @@ class Process_API_kill(APIView):
                 kill_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-        processes = get_process_info()
+        status_, processes_data = get_process_info()
+        if status_ == False:
+            return Response(
+                {"ERROR": f"Process fetching failed due: {processes_data}"},
+                status=status.HTTP_500_BAD_REQUEST,
+            )
+
 
         if request.headers.get("HX-Request") == "true":
             return render(
                 request,
                 f"{partials_dir}/proc_table.html",
-                {"processes": processes},
+                {"processes": processes_data},
             )
         else:
             return render(
                 request,
                 f"{templates_dir}/proc-browser.html",
-                {"processes": processes},
+                {"processes": processes_data},
             )
 
 
