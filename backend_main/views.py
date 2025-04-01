@@ -7,7 +7,6 @@ from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import pathlib
-from django.conf import settings
 from .models import ProcessObject, SnapshotObject, KillLog_object
 from .auth_utils import ban_token, get_tokens_for_user
 from .serializers import (
@@ -120,7 +119,6 @@ class Process_API_kill(APIView):
             return Response(
                 kill_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
-
 
         processes = get_process_info()
 
