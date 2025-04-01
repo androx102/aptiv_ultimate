@@ -11,7 +11,7 @@ def get_process_info():
     if settings.DUMMY_PROCESS_DATA:
         process_info = {
             "process_id": 2137,
-            "process_status": sleeping,
+            "process_status": "sleeping",
             "process_start_time":"2025-03-20 20:43:30",
             "process_duration":2307000000,
             "process_name":"test_proc",
