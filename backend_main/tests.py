@@ -268,8 +268,12 @@ class ProcessBrowserKillAPITest(TestCase):
 
 ####################################################################################
 class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
+
+    def setUp(self):
+        self.client = Client()
+
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
         super().setUpClass()
         cls.user = get_user_model().objects.create_user(
             username="testuser", password="testpass"
@@ -278,8 +282,6 @@ class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
         cls.take_snapshot_api = reverse("take_snapshot")
         cls.sing_in_url = reverse("sign_in")
 
-    def setUp(self):
-        self.client = Client()
 
     @classmethod
     def tearDownClass(cls):
@@ -298,6 +300,8 @@ class ProcessBrowserSnapAPITest_Experimental(StaticLiveServerTestCase):
         self.client.cookies["access_token"] = self.token
         response = self.client.get(self.take_snapshot_api)
         self.assertEqual(response.status_code, 200)
+        
+        
 
     def test_take_snapshot_fail(self):
         # TODO: create snapshot fail
@@ -444,6 +448,7 @@ class SnapshotBrowserViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+        
 
 
 ################ DRAFTS ################
