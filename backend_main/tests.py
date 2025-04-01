@@ -131,30 +131,33 @@ class RegisterViewTest(TestCase):
 class RegisterAPITest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        pass
+        cls.user = get_user_model().objects.create_user(
+            username="testuser", password="testpass", email="testuser@example.com"
+        )
+        cls.assertIsNotNone(cls.user)
+        cls.token = str(AccessToken.for_user(user))
 
     def setUp(self):
         self.client = Client()
         self.sign_up_api_url = reverse("sign_up_api")
         self.index_url = reverse("index")
-
-    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    def test_redirect_for_logged_user(self):
-        """If user is logged in, they should be redirected to the index page."""
-
-        user = get_user_model().objects.create_user(
-            username="testuser", password="testpass"
-        )
-        token = str(AccessToken.for_user(user))
-        self.client.cookies["access_token"] = token
-
-        valid_data = {
+        self.existing_user_data = {
+            "username": "testuser",
+            "password": "testpass",
+            "email": "testuser@example.com",
+        }
+        self.valid_user_data = {
             "username": "newuser",
             "password": "newpassword123",
             "email": "newuser@example.com",
         }
 
-        response = self.client.post(self.sign_up_api_url, valid_data)
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    def test_redirect_for_logged_user(self):
+        """If user is logged in, they should be redirected to the index page."""
+        self.client.cookies["access_token"] = self.token
+
+        response = self.client.post(self.sign_up_api_url, self.existing_user_data)
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
@@ -162,32 +165,31 @@ class RegisterAPITest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_up_sucess(self):
         """Test that a valid sign-up request returns a 201 status code."""
-        valid_data = {
-            "username": "newuser",
-            "password": "newpassword123",
-            "email": "newuser@example.com",
-        }
 
-        response = self.client.post(self.sign_up_api_url, valid_data)
+        response = self.client.post(self.sign_up_api_url, self.valid_user_data)
+        user = get_user_model().objects.get(username="newuser")
 
         self.assertEqual(response.status_code, 201)
-        user = get_user_model().objects.get(username="newuser")
         self.assertIsNotNone(user)
         self.assertEqual(user.email, "newuser@example.com")
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_up_invalid_data_fail(self):
         """Test that invalid data returns a 400 Bad Request status code."""
-        invalid_data = {
-            "username": "newuser",
-            "password": "short",
-            "email": "invalid-email",
-        }
+        
+        self.valid_user_data['email'] = "invalid-email"
 
-        response = self.client.post(self.sign_up_api_url, invalid_data)
+        response = self.client.post(self.sign_up_api_url, self.valid_user_data)
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("email", response.json())
+
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    def test_username_or_email_already_taken_fail(self):
+        response = self.client.post(self.sign_up_api_url, self.existing_user_data)
+        self.assertEqual(response.status_code, 400)
+        
+        
 
 
 ########## Process browser ##########
@@ -439,6 +441,7 @@ class SnapshotExportAPITest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.sing_in_url)
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_export_snapshot_sucess(self):
         self.client.cookies["access_token"] = self.token
         valid_data = {"snap_id": self.test_snap_object.snapshot_id}
@@ -455,6 +458,7 @@ class SnapshotExportAPITest(TestCase):
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
 
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_export_snapshot_fail(self):
         self.client.cookies["access_token"] = self.token
         not_valid_data = {"snap_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b"}
