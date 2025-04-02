@@ -56,9 +56,9 @@ class Process_browser_view(APIView):
 
 
 class Process_API_snap(APIView):
-    def get(self, request):        
+    def get(self, request):
         snap_serializer = SnapshotSerializer(data={"snapshot_author": request.user.id})
-    
+
         if snap_serializer.is_valid():
             snap = snap_serializer.save()
         else:
