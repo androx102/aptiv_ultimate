@@ -22,9 +22,15 @@ class AcessTest(TestCase):
         cls.token = str(AccessToken.for_user(cls.user))
 
         cls.protected_views_endpoints = [
-            {"url":reverse("processes"), "template":f"{templates_dir}/proc-browser.html"},
-            {"url":reverse("snapshots"), "template":f"{templates_dir}/snapshots.html"},
-            {"url":reverse("kill-log"), "template":f"{templates_dir}/kill-log.html"},
+            {
+                "url": reverse("processes"),
+                "template": f"{templates_dir}/proc-browser.html",
+            },
+            {
+                "url": reverse("snapshots"),
+                "template": f"{templates_dir}/snapshots.html",
+            },
+            {"url": reverse("kill-log"), "template": f"{templates_dir}/kill-log.html"},
         ]
 
         cls.protected_api_endpoints = [
@@ -32,14 +38,14 @@ class AcessTest(TestCase):
             reverse("kill_proc"),
             reverse("export_snap"),
         ]
-        
+
         cls.sign_in_url = reverse("sign_in")
         cls.sign_in_template = f"{templates_dir}/sign-in.html"
         cls.sign_up_url = reverse("sign_up")
         cls.sign_up_template = f"{templates_dir}/sign-up.html"
         cls.index_url = reverse("index")
         cls.index_template = f"{templates_dir}/index.html"
-        
+
         cls.sign_in_api_url = reverse("sign_in_api")
         cls.sign_up_api_url = reverse("sign_up_api")
 
@@ -49,10 +55,10 @@ class AcessTest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_not_logged_user_acess(self):
         for endpoint in self.protected_views_endpoints:
-            response = self.client.get(endpoint['url'])
+            response = self.client.get(endpoint["url"])
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, self.sign_in_url)
-        
+
         for endpoint in self.protected_api_endpoints:
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 302)
@@ -70,35 +76,34 @@ class AcessTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.index_template)
 
-    #@unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    # @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_user_logged_get_view(self):
         self.client.cookies["access_token"] = self.token
-        
+
         for endpoint in self.protected_views_endpoints:
-            response = self.client.get(endpoint['url'])
+            response = self.client.get(endpoint["url"])
             self.assertEqual(response.status_code, 200)
-            self.assertTemplateUsed(response, endpoint['template'])
+            self.assertTemplateUsed(response, endpoint["template"])
 
         response = self.client.get(self.sign_in_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
-    
+
         response = self.client.get(self.sign_up_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
-    
+
         response = self.client.get(self.index_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.index_template)
-        
+
         response = self.client.post(self.sign_in_api_url)
-        self.assertEqual(response.status_code, 302) #issue here
+        self.assertEqual(response.status_code, 302)  # issue here
         self.assertRedirects(response, self.index_url)
 
         response = self.client.post(self.sign_up_api_url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
-
 
 
 ########## Auth ##########
@@ -115,8 +120,6 @@ class LoginAPITest(TestCase):
     def setUp(self):
         self.client = Client()
         self.valid_data = {"username": "testuser", "password": "testpass"}
-
-
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_in_sucess(self):
@@ -135,8 +138,6 @@ class LoginAPITest(TestCase):
 
         self.assertEqual(response.status_code, 401)
         self.assertNotIn("access_token", response.cookies)
-
-
 
 
 class RegisterAPITest(TestCase):
@@ -159,7 +160,6 @@ class RegisterAPITest(TestCase):
             "password": "newpassword123",
             "email": "newuser@example.com",
         }
-
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_sign_up_sucess(self):
@@ -203,7 +203,6 @@ class ProcessBrowserViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.client.cookies["access_token"] = self.token
-
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_get_partial_view(self):
@@ -300,8 +299,6 @@ class SnapshotBrowserViewTest(TestCase):
                 snapshot_id=self.test_snap_object.snapshot_id
             ).exists()
         )
-
-
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_get_details_correct_id_sucess(self):
@@ -414,7 +411,6 @@ class KillLogBrowserViewTest(TestCase):
         cls.token = str(AccessToken.for_user(cls.user))
         cls.kill_log_url = reverse("kill-log")
 
-
     def setUp(self):
         self.client = Client()
         self.client.cookies["access_token"] = self.token
@@ -429,7 +425,6 @@ class KillLogBrowserViewTest(TestCase):
                 KillLog_ID=self.test_killlog_object.KillLog_ID
             ).exists()
         )
-
 
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_remove_kill_log_entry_sucess(self):
