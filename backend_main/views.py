@@ -32,7 +32,7 @@ class index(APIView):
         )
 
 
-class Process_browser_view(APIView):
+class ProcessBrowserView(APIView):
     def get(self, request):
         status_, processes_data = get_process_info()
         if status_ == False:
@@ -55,7 +55,7 @@ class Process_browser_view(APIView):
             )
 
 
-class Process_API_snap(APIView):
+class ProcessBrowserSnapAPI(APIView):
     def get(self, request):
         snap_serializer = SnapshotSerializer(data={"snapshot_author": request.user.id})
 
@@ -86,7 +86,7 @@ class Process_API_snap(APIView):
             return Response(proc_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class Process_API_kill(APIView):
+class ProcessBrowserKillAPI(APIView):
     def post(self, request):
         user_id = request.user.id
         pid = request.POST.get("pid")
@@ -141,7 +141,7 @@ class Process_API_kill(APIView):
             )
 
 
-class Snapshot_browser_view(APIView):
+class SnapshotBrowserView(APIView):
     def get(self, request):
         snap_id = request.GET.get("snap_id")
 
@@ -182,7 +182,7 @@ class Snapshot_browser_view(APIView):
         )
 
 
-class Snapshot_API_export(APIView):
+class SnapshotExportAPI(APIView):
     def get(self, request):
         snap_id = request.GET.get("snap_id")
         if snap_id == None:
@@ -200,7 +200,7 @@ class Snapshot_API_export(APIView):
         return resp_
 
 
-class Kill_Log_browser_view(APIView):
+class KillLogBrowserView(APIView):
     def get(self, request):
         kills = KillLog_object.objects.all()
         return render(request, f"{templates_dir}/kill-log.html", {"kills": kills})
@@ -219,10 +219,9 @@ class Kill_Log_browser_view(APIView):
 
 
 ###########################################################################
-# Auth methods
+# Auth endpoints
 
-
-class Register_view(APIView):
+class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
@@ -234,7 +233,7 @@ class Register_view(APIView):
             )
 
 
-class Register_API(APIView):
+class RegisterAPI(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -252,7 +251,7 @@ class Register_API(APIView):
             return Response(usr_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class Login_view(APIView):
+class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
@@ -264,7 +263,7 @@ class Login_view(APIView):
             )
 
 
-class Login_API(APIView):
+class LoginAPI(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -301,7 +300,7 @@ class Login_API(APIView):
             )
 
 
-class Log_out_API(APIView):
+class LogOutAPI(APIView):
     def get(self, request):
         if not request.user.is_authenticated:
             return redirect("/")

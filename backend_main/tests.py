@@ -213,6 +213,38 @@ class ProcessBrowserViewTest(TestCase):
         self.assertTemplateUsed(response, self.proc_table_template)
 
 
+
+
+class ProcessBrowserSnapAPITest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = get_user_model().objects.create_user(
+            username="testuser", password="testpass"
+        )
+        cls.token = str(AccessToken.for_user(cls.user))
+        cls.take_snapshot_api = reverse("take_snapshot")
+
+    def setUp(self):
+        self.client = Client()
+        self.client.cookies["access_token"] = self.token
+
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    @override_settings(DUMMY_PROCESS_DATA=True)
+    def test_take_snapshot_sucess(self):
+        response = self.client.get(self.take_snapshot_api)
+        self.assertEqual(response.status_code, 200)
+
+
+    #Need to fix this
+    #########################################################
+    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
+    @override_settings(DUMMY_PROCESS_DATA=True)
+    def test_take_snapshot_fail(self):
+        response = self.client.get(self.take_snapshot_api)
+        #self.assertEqual(response.status_code, 500)
+
+    #########################################################
+    
 class ProcessBrowserKillAPITest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -243,36 +275,6 @@ class ProcessBrowserKillAPITest(TestCase):
         self.valid_data["pid"] = "420"
         response = self.client.post(self.kill_proc_api, self.valid_data)
         self.assertEqual(response.status_code, 400)
-
-
-class ProcessBrowserSnapAPITest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(
-            username="testuser", password="testpass"
-        )
-        cls.token = str(AccessToken.for_user(cls.user))
-        cls.take_snapshot_api = reverse("take_snapshot")
-
-    def setUp(self):
-        self.client = Client()
-        self.client.cookies["access_token"] = self.token
-
-    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    @override_settings(DUMMY_PROCESS_DATA=True)
-    def test_take_snapshot_sucess(self):
-        response = self.client.get(self.take_snapshot_api)
-        self.assertEqual(response.status_code, 200)
-
-    #########################################################
-    @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
-    @override_settings(DUMMY_PROCESS_DATA=False)
-    def test_take_snapshot_fail(self):
-        response = self.client.get(self.take_snapshot_api)
-
-    # self.assertEqual(response.status_code, 500)
-
-    #########################################################
 
 
 ########## Snapshot browser ##########
@@ -395,11 +397,14 @@ class SnapshotExportAPITest(TestCase):
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
 
+    #Need to fix this
+    ##########################################################
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     def test_export_snapshot_fail(self):
         not_valid_data = {"snap_id": "1dd4f9b0-5a36-490d-a327-4f9d002bd18b"}
 
         response = self.client.get(self.snapshots_export_url, not_valid_data)
+    ##########################################################
 
 
 class KillLogBrowserViewTest(TestCase):
