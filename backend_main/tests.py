@@ -61,9 +61,10 @@ class AcessTest(TestCase):
         response = self.client.get(self.sign_up_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, self.sign_up_template)
-        
+
         response = self.client.get(self.index_url)
         self.assertEqual(response.status_code, 200)
+
 
 #        response = self.client.get(self.sign_in_api_url)
 #        self.assertEqual(response.status_code, 405)
@@ -73,7 +74,6 @@ class AcessTest(TestCase):
 #
 
 
-
 ########## Auth ##########
 class LoginViewTest(TestCase):
     @classmethod
@@ -81,7 +81,7 @@ class LoginViewTest(TestCase):
         cls.user = get_user_model().objects.create_user(
             username="testuser", password="testpass"
         )
-        cls.token = str(AccessToken.for_user(cls.user))           
+        cls.token = str(AccessToken.for_user(cls.user))
         cls.sign_in_url = reverse("sign_in")
         cls.index_url = reverse("index")
 
@@ -164,6 +164,7 @@ class RegisterViewTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.index_url)
+
 
 class RegisterAPITest(TestCase):
     @classmethod
@@ -307,7 +308,6 @@ class ProcessBrowserSnapAPITest(TestCase):
     @unittest.skipIf(SKIP_OLD_TESTS, "Skipping old tests")
     @override_settings(DUMMY_PROCESS_DATA=True)
     def test_take_snapshot_sucess(self):
-        
         response = self.client.get(self.take_snapshot_api)
         self.assertEqual(response.status_code, 200)
 
