@@ -221,6 +221,7 @@ class KillLogBrowserView(APIView):
 ###########################################################################
 # Auth endpoints
 
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 

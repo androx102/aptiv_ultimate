@@ -8,18 +8,19 @@ from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 import pathlib
 
 templates_dir = pathlib.Path(__file__).resolve().parent / "templates" / "backend_main"
-RED = '\033[31m'
-RESET = '\033[0m'
+RED = "\033[31m"
+RESET = "\033[0m"
+
 
 def custom_exception_handler(exc, context):
     if isinstance(exc, (AuthenticationFailed, NotAuthenticated, PermissionDenied)):
         return redirect("/sign-in/")
-    
+
     if settings.DEBUG == True:
         print(f"{RED}####### WARNING! CRITICAL ERROR! ######{RESET}\n")
         print(f"{RED}Context:{RESET} {context}\n {RED}Error:{RESET}{exc}\n")
         print(f"{RED}#######################################{RESET}\n")
-        
+
     response = exception_handler(exc, context)
     if response is None:
         return Response({"error": "An unexpected error occurred"}, status=500)
