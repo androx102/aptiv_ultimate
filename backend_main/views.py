@@ -56,9 +56,9 @@ class Process_browser_view(APIView):
 
 
 class Process_API_snap(APIView):
-    def get(self, request):
-        snap_serializer = SnapshotSerializer(snapshot_author=request.user.id)
-
+    def get(self, request):        
+        snap_serializer = SnapshotSerializer(data={"snapshot_author": request.user.id})
+    
         if snap_serializer.is_valid():
             snap = snap_serializer.save()
         else:
@@ -68,7 +68,7 @@ class Process_API_snap(APIView):
         if status_ == False:
             return Response(
                 {"ERROR": f"Snapshot failed due: {processes_data}"},
-                status=status.HTTP_200_OK,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         for proces in processes_data:
